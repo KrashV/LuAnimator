@@ -22,6 +22,11 @@ namespace LuAnimatorV2
 
             System.Version version = app.GetName().Version;
 
+            if (System.Deployment.Application.ApplicationDeployment.IsNetworkDeployed)
+            {
+                version = System.Deployment.Application.ApplicationDeployment.CurrentDeployment.CurrentVersion;
+            }
+
             Title = System.String.Format("About {0}", title.Title);
             lblName.Text = title.Title;
             lblDescription.Text = description.Description;
