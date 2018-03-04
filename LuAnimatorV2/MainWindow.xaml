@@ -6,7 +6,7 @@
         xmlns:dd="urn:gong-wpf-dragdrop"
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         mc:Ignorable="d"
-        Title="LuAnimator v4. Plz Donate"
+        Title="LuAnimator v4. Plz Donate."
         Height="560" Width="854" Style="{DynamicResource CustomWindow}" ResizeMode="CanMinimize"
         Closing="Window_Closing">
     <Window.Resources>
