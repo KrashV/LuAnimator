@@ -1025,8 +1025,7 @@ namespace LuAnimatorV2
                         try
                         {
                             ad.Update();
-                            MessageBox.Show("The application has been upgraded, and will now restart.");
-                            System.Diagnostics.Process.Start(System.Windows.Forms.Application.ExecutablePath);
+                            MessageBox.Show("The application has been upgraded, you may now restart.");
                             System.Windows.Forms.Application.Exit();
                         }
                         catch (DeploymentDownloadException dde)
