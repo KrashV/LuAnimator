@@ -10,6 +10,8 @@ using DrawablesGeneratorTool;
 
 using FormCollection = System.Collections.ObjectModel.ObservableCollection<LuAnimatorV2.modeNode>;
 using AnimationCollection = System.Collections.ObjectModel.ObservableCollection<System.Collections.ObjectModel.ObservableCollection<LuAnimatorV2.modeNode>>;
+using System.Threading.Tasks;
+using System.Collections.Generic;
 
 namespace LuAnimatorV2
 {
@@ -157,7 +159,7 @@ namespace LuAnimatorV2
                         {
                             mode = new modeNode();
                             mode.modeName = stateName;
-                            mode.emotes = new System.Collections.Generic.List<emoteNode>();
+                            mode.emotes = new List<emoteNode>();
                             animation[currentForm].Add(mode);
                         }
 
@@ -191,34 +193,42 @@ namespace LuAnimatorV2
 
                             if (jEmote.Value["frames"] != null)
                             {
-                                BitmapSource[] frames = new BitmapSource[jEmote.Value["frames"].Count()];
-                                int i = 0;
+                                int count = jEmote.Value["frames"].Count();
+                                emote.frames = new BitmapSource[count];
+
+                                List<Task<BitmapSource>> tasks = new List<Task<BitmapSource>>();
+
                                 foreach (string directive in jEmote.Value["frames"])
                                 {
-                                    Bitmap bmp = new Bitmap(64, 64);
-                                    StarCheatReloaded.GUI.Directive.ApplyDirectives(ref bmp, directive);
-
-                                    frames[i++] = BitmapConverter.BitmapToBitmapSource(bmp);
-                                    bmp.Dispose();
+                                    tasks.Add(GetBitmapSource(directive));
                                 }
 
-                                emote.frames = frames;
+                                Task.WaitAll(tasks.ToArray<Task>());
+
+                                for (int i = 0; i < count; i++)
+                                {
+                                    emote.frames[i] = tasks[i].Result;
+                                }
                             }
 
                             if (jEmote.Value["fullbrightFrames"] != null)
                             {
-                                BitmapSource[] fullbrightFrames = new BitmapSource[jEmote.Value["frames"].Count()];
-                                int i = 0;
-                                foreach (string directive in jEmote.Value["frames"])
-                                {
-                                    Bitmap bmp = new Bitmap(64, 64);
-                                    StarCheatReloaded.GUI.Directive.ApplyDirectives(ref bmp, directive);
+                                int count = jEmote.Value["fullbrightFrames"].Count();
+                                emote.fullbrightFrames = new BitmapSource[count];
 
-                                    fullbrightFrames[i++] = BitmapConverter.BitmapToBitmapSource(bmp);
-                                    bmp.Dispose();
+                                List<Task<BitmapSource>> tasks = new List<Task<BitmapSource>>();
+
+                                foreach (string directive in jEmote.Value["fullbrightFrames"])
+                                {
+                                    tasks.Add(GetBitmapSource(directive));
                                 }
 
-                                emote.fullbrightFrames = fullbrightFrames;
+                                Task.WaitAll(tasks.ToArray<Task>());
+
+                                for (int i = 0; i < count; i++)
+                                {
+                                    emote.fullbrightFrames[i] = tasks[i].Result;
+                                }
                             }
                         }
                     }
@@ -229,6 +239,18 @@ namespace LuAnimatorV2
                 return null;
             }
             return animation;
+        }
+
+        private static Task<BitmapSource> GetBitmapSource(string directive)
+        {
+            return Task.Run(() => {
+                Bitmap bmp = new Bitmap(64, 64);
+                StarCheatReloaded.GUI.Directive.ApplyDirectives(ref bmp, directive);
+
+                BitmapSource frame = BitmapConverter.BitmapToBitmapSource(bmp);
+                bmp.Dispose();
+                return frame;
+            });
         }
     }
 }

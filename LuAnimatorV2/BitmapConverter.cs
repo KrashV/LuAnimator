@@ -55,7 +55,7 @@ namespace LuAnimatorV2
             {
                 DeleteObject(ip);
             }
-
+            bs.Freeze();
             return bs;
         }
     }
