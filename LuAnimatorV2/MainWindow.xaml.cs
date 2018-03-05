@@ -10,11 +10,7 @@ using System.Linq;
 using System.Windows.Media.Imaging;
 using DrawablesGeneratorTool;
 using Microsoft.Win32;
-
-using Newtonsoft.Json;
 using System.IO;
-using System.Windows.Controls.Primitives;
-using Newtonsoft.Json.Linq;
 using System.Threading;
 using System.Windows.Controls;
 
@@ -1030,8 +1026,7 @@ namespace LuAnimatorV2
                         {
                             ad.Update();
                             MessageBox.Show("The application has been upgraded, and will now restart.");
-                            System.Diagnostics.Process.Start(Application.ResourceAssembly.Location);
-                            Application.Current.Shutdown();
+                            System.Windows.Forms.Application.Restart();
                         }
                         catch (DeploymentDownloadException dde)
                         {
