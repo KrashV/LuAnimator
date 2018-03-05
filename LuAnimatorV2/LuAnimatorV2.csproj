@@ -34,7 +34,7 @@
     <WebPage>publish.htm</WebPage>
     <OpenBrowserOnPublish>false</OpenBrowserOnPublish>
     <TrustUrlParameters>true</TrustUrlParameters>
-    <ApplicationRevision>1</ApplicationRevision>
+    <ApplicationRevision>3</ApplicationRevision>
     <ApplicationVersion>4.0.3.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <CreateDesktopShortcut>true</CreateDesktopShortcut>
@@ -65,10 +65,10 @@
   </PropertyGroup>
   <PropertyGroup />
   <PropertyGroup>
-    <ManifestCertificateThumbprint>4FF4F21A2FB505BDA42141802F349ECFA128C142</ManifestCertificateThumbprint>
+    <ManifestCertificateThumbprint>4292915D86EC8E6B04781B9B8CBCC22869328F53</ManifestCertificateThumbprint>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestKeyFile>LuAnimatorV2_1_TemporaryKey.pfx</ManifestKeyFile>
+    <ManifestKeyFile>LuAnimatorV2_TemporaryKey.pfx</ManifestKeyFile>
   </PropertyGroup>
   <PropertyGroup>
     <GenerateManifests>true</GenerateManifests>
@@ -80,10 +80,16 @@
     <ManifestTimestampUrl>http://timestamp.verisign.com/scripts/timstamp.dll</ManifestTimestampUrl>
   </PropertyGroup>
   <PropertyGroup>
-    <TargetZone>LocalIntranet</TargetZone>
+    <TargetZone>Internet</TargetZone>
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationManifest>Properties\app.manifest</ApplicationManifest>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>LuAnimatorV2_TemporaryKey.pfx</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="GongSolutions.Wpf.DragDrop, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
@@ -173,6 +179,9 @@
       <DependentUpon>CropWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="ImageCropper.cs" />
+    <Page Include="Icons.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -205,7 +214,6 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <None Include="LuAnimatorV2_1_TemporaryKey.pfx" />
     <None Include="LuAnimatorV2_TemporaryKey.pfx" />
     <None Include="packages.config" />
     <None Include="Properties\app.manifest" />
@@ -220,24 +228,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Resources\DarkSmall.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Resources\duck.png" />
-    <Resource Include="Resources\sit.png" />
-    <Resource Include="Resources\stand.png" />
-  </ItemGroup>
-  <ItemGroup>
     <Resource Include="Resources\assetmissing.png" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\Background.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Resources\City.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Resources\GreenWall.png" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="icon.ico" />
@@ -253,9 +247,6 @@
       <ProductName>.NET Framework 3.5 SP1</ProductName>
       <Install>false</Install>
     </BootstrapperPackage>
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Resources\D.png" />
   </ItemGroup>
   <ItemGroup>
     <PublishFile Include="de\Xceed.Wpf.AvalonDock.resources">
@@ -438,6 +429,19 @@
       <IncludeHash>True</IncludeHash>
       <FileType>Satellite</FileType>
     </PublishFile>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\CharacterPreview\duck.png" />
+    <Resource Include="Resources\CharacterPreview\sit.png" />
+    <Resource Include="Resources\CharacterPreview\stand.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\BackgroundPreview\City.png" />
+    <Resource Include="Resources\BackgroundPreview\DarkSmall.png" />
+    <Resource Include="Resources\BackgroundPreview\GreenWall.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\DegranonLogo.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

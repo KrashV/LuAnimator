@@ -1,6 +1,4 @@
-﻿using GongSolutions.Wpf.DragDrop;
-using System;
-using System.Collections.ObjectModel;
+﻿using System;
 using System.Windows.Threading;
 using System.Windows;
 using System.Drawing;
@@ -8,15 +6,16 @@ using System.Drawing.Imaging;
 using System.Windows.Input;
 using System.Linq;
 using System.Windows.Media.Imaging;
-using DrawablesGeneratorTool;
 using Microsoft.Win32;
 using System.IO;
 using System.Threading;
 using System.Windows.Controls;
+using System.Deployment.Application;
+using DrawablesGeneratorTool;
 
 using FormCollection = System.Collections.ObjectModel.ObservableCollection<LuAnimatorV2.modeNode>;
 using AnimationCollection = System.Collections.ObjectModel.ObservableCollection<System.Collections.ObjectModel.ObservableCollection<LuAnimatorV2.modeNode>>;
-using System.Deployment.Application;
+
 
 namespace LuAnimatorV2
 {
@@ -28,23 +27,22 @@ namespace LuAnimatorV2
 
     public partial class MainWindow : Window
     {
-        AnimationCollection currentForms = new AnimationCollection();
+        AnimationCollection animationCollection = new AnimationCollection();
 
-        private static int currentForm = 0;
-        private static int currentFrame = 0;
+        private static int currentForm = 0,
+                           currentFrame = 0,
+                           animationSpeed = 9;
 
         private System.Windows.Controls.Image currentImage;
 
-        private static string previousMode = "Idle";
-        private static string previousEmote = "idle";
+        private static string previousMode = "Idle",
+                              previousEmote = "idle";
 
         private static readonly int
             PREVIEW_MARGIN_LEFT = 202,
             PREVIEW_MARGIN_TOP = 300,
             PREVIEW_MARGIN_RIGHT = 192,
             PREVIEW_MARGIN_BOTTOM = 73;
-
-        private static int animationSpeed = 9;
 
         private static DispatcherTimer _timer;
 
@@ -54,9 +52,9 @@ namespace LuAnimatorV2
         {
             InitializeComponent();
 
-            WindowStartupLocation = System.Windows.WindowStartupLocation.CenterScreen;
+            this.WindowStartupLocation = System.Windows.WindowStartupLocation.CenterScreen;
 
-            InstallUpdateSyncWithInfo();
+            InstallUpdateSyncWithInfo(false);
 
             InitializeImage(imgPreview);
             InitializeImage(imgPreviewF);
@@ -109,9 +107,9 @@ namespace LuAnimatorV2
 
             System.Windows.Controls.Image backImage = currentImage == imgPreview ? imgPreviewF : imgPreview;
 
-            if (currentForms.Count != 0)
+            if (animationCollection.Count != 0)
             { 
-                modeNode mode = currentForms[currentForm].FirstOrDefault(form => form.modeName == previousMode);
+                modeNode mode = animationCollection[currentForm].FirstOrDefault(form => form.modeName == previousMode);
 
                 if (mode != null)
                 {
@@ -173,21 +171,28 @@ namespace LuAnimatorV2
 
         #endregion
 
+        /// <summary>
+        /// Reset the animation container
+        /// </summary>
         private void CleanUP()
         {
-            foreach (FormCollection form in currentForms)
+            foreach (FormCollection form in animationCollection)
             {
                 form.Clear();
             }
-            currentForms = new AnimationCollection();
+            animationCollection = new AnimationCollection();
         }
 
+        /// <summary>
+        /// Populate the ListBox
+        /// </summary>
+        /// <param name="files">Files to check and put on success</param>
         private void PopulateListBox(string[] files)
         {
             ListBoxFrames.Items.Clear();
             foreach (string path in files)
             {
-                if (DrawableUtilities.IsValidImage(path))
+                if (IsValidImage(path))
                 {
                     BitmapSource p = new BitmapImage(new Uri(path));
                     ListBoxFrames.Items.Add(p);
@@ -204,6 +209,11 @@ namespace LuAnimatorV2
             }
         }
 
+        /// <summary>
+        /// Extract the frames from the gif
+        /// </summary>
+        /// <param name="sourceGifPath">The path to the gif</param>
+        /// <returns>Array of frames</returns>
         private BitmapSource[] ExtractGif(string sourceGifPath)
         {
             // Get frames from GIF
@@ -226,13 +236,17 @@ namespace LuAnimatorV2
             for (int i = 0; i < frameCount; i++)
             {
                 Bitmap t = new Bitmap(frames[i]);
-                list[i] = BitmapConverter.loadBitmap(t);
+                list[i] = BitmapConverter.BitmapToBitmapSource(t);
                 t.Dispose();
             }
 
             return list;
         }
 
+        /// <summary>
+        /// Populate the ListBox
+        /// </summary>
+        /// <param name="frames">Frames to put in the ListBox</param>
         private void PopulateListBox(BitmapSource[] frames)
         {
             ListBoxFrames.Items.Clear();
@@ -283,7 +297,7 @@ namespace LuAnimatorV2
             if (resourcePath.IndexOf("/") == 0)
                 resourcePath = resourcePath.Substring(1);
 
-            imgPreviewBackground.Source = new BitmapImage(new Uri(@"Resources/" + resourcePath, UriKind.Relative));
+            imgPreviewBackground.Source = new BitmapImage(new Uri(@"Resources/BackgroundPreview/" + resourcePath, UriKind.Relative));
         }
 
         #endregion
@@ -411,20 +425,20 @@ namespace LuAnimatorV2
 
         private void Advanced_Save()
         {
-            if (currentForms.ElementAtOrDefault(currentForm) == null)
+            if (animationCollection.ElementAtOrDefault(currentForm) == null)
             {
                 FormCollection f = new FormCollection();
-                currentForms.Add(f);
+                animationCollection.Add(f);
             }
             if (ListBoxFrames != null && !ListBoxFrames.Items.IsEmpty)
             {
-                modeNode mode = currentForms[currentForm].FirstOrDefault(form => form.modeName == previousMode);
+                modeNode mode = animationCollection[currentForm].FirstOrDefault(form => form.modeName == previousMode);
                 if (mode == null)
                 {
                     mode = new modeNode();
                     mode.modeName = previousMode;
                     mode.emotes = new System.Collections.Generic.List<emoteNode>();
-                    currentForms[currentForm].Add(mode);
+                    animationCollection[currentForm].Add(mode);
                 }
                 emoteNode emote = mode.emotes.FirstOrDefault(em => em.name == previousEmote);
                 if (emote == null)
@@ -441,8 +455,8 @@ namespace LuAnimatorV2
 
         private void Advanced_Load()
         {
-            if (currentForms.ElementAtOrDefault(currentForm) == null)
-                currentForms.Add(new FormCollection());
+            if (animationCollection.ElementAtOrDefault(currentForm) == null)
+                animationCollection.Add(new FormCollection());
 
             ComboBoxItem CBIM = (ComboBoxItem)cbxGenerateType.SelectedValue;
             string state = CBIM.Content.ToString();
@@ -451,7 +465,7 @@ namespace LuAnimatorV2
             string emotestate = CBIE.Content.ToString();
 
 
-            modeNode oldmode = currentForms[currentForm].FirstOrDefault(form => form.modeName == state);
+            modeNode oldmode = animationCollection[currentForm].FirstOrDefault(form => form.modeName == state);
 
             if (oldmode != null)
             {
@@ -493,9 +507,15 @@ namespace LuAnimatorV2
                 soundName.Text = "";
         }
 
-#endregion
+        #endregion
 
         #region Sound Button
+
+        /// <summary>
+        /// Select the vanilla sounds from the folder with unpacked assets
+        /// </summary>
+        /// <param name="sender">The source of the event</param>
+        /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
         private void Button_Sound(object sender, RoutedEventArgs e)
         {
             OpenFileDialog openFileDialog = new OpenFileDialog();
@@ -508,6 +528,11 @@ namespace LuAnimatorV2
             }
         }
 
+        /// <summary>
+        /// Clear the sound selection
+        /// </summary>
+        /// <param name="sender">The source of the event</param>
+        /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
         private void Button_Remove_Sound(object sender, RoutedEventArgs e)
         {
             if (soundName.Text.Length > 0)
@@ -518,7 +543,7 @@ namespace LuAnimatorV2
                 ComboBoxItem CBIE = (ComboBoxItem)cbxGenerateEmote.SelectedValue;
                 string emotestate = CBIE.Content.ToString();
 
-                modeNode mode = currentForms[currentForm].FirstOrDefault(form => form.modeName == state);
+                modeNode mode = animationCollection[currentForm].FirstOrDefault(form => form.modeName == state);
 
                 if (mode != null)
                 {
@@ -562,6 +587,11 @@ namespace LuAnimatorV2
 
         #region Event handlers
 
+        /// <summary>
+        /// ListBox scrollbar handler
+        /// </summary>
+        /// <param name="sender">The source of the event</param>
+        /// <param name="e">The <see cref="MouseWheelEventArgs"/> instance containing the event data.</param>
         private void HorizontalScrollViewer_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
         {
             ScrollViewer s = (ScrollViewer)sender;
@@ -577,32 +607,62 @@ namespace LuAnimatorV2
             e.Handled = true;
         }
 
+        /// <summary>
+        /// Set the selected ListBox item to null on mouse leave
+        /// </summary>
+        /// <param name="sender">The source of the event</param>
+        /// <param name="e">The <see cref="MouseEventArgs"/> instance containing the event data.</param>
         private void ListBox_MouseLeave(object sender, MouseEventArgs e)
         {
             ListBoxFrames.SelectedItem = null;
         }
 
+        /// <summary>
+        /// Remove the selected item on drag
+        /// </summary>
+        /// <param name="sender">The source of the event</param>
+        /// <param name="e">The <see cref="DragEventArgs"/> instance containing the event data.</param>
         private void ListBox_DragLeave(object sender, DragEventArgs e)
         {
             if (ListBoxFrames.SelectedItem != null)
                 ListBoxFrames.Items.Remove(ListBoxFrames.SelectedItem);
         }
 
+        /// <summary>
+        /// Put the dragged item in the ListBox
+        /// </summary>
+        /// <param name="sender">The source of the event</param>
+        /// <param name="e">The <see cref="DragEventArgs"/> instance containing the event data.</param>
         private void ListBox_DragEnter(object sender, DragEventArgs e)
         {
             if (e.Data.GetDataPresent(DataFormats.FileDrop)) e.Effects = DragDropEffects.Copy;
         }
 
+        /// <summary>
+        /// Make the character semi-transparent if it will be invisible during the animations
+        /// </summary>
+        /// <param name="sender">The source of the event</param>
+        /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
         private void CheckBox_Invisible_Checked(object sender, EventArgs e)
         {
             imgPreviewCharacter.Opacity = 0.5;
         }
 
+        /// <summary>
+        /// Make the character fullbright if it will be visible during the animations
+        /// </summary>
+        /// <param name="sender">The source of the event</param>
+        /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
         private void CheckBox_Invisible_Unchecked(object sender, EventArgs e)
         {
             imgPreviewCharacter.Opacity = 1;
         }
 
+        /// <summary>
+        /// Populate the ListBox with dragged images
+        /// </summary>
+        /// <param name="sender">The source of the event</param>
+        /// <param name="e">The <see cref="DragEventArgs"/> instance containing the event data.</param>
         private void Border_Drop(object sender, DragEventArgs e)
         {
             if (e.Data.GetDataPresent(DataFormats.FileDrop))
@@ -613,6 +673,11 @@ namespace LuAnimatorV2
             }
         }
 
+        /// <summary>
+        /// Clear the ListBox
+        /// </summary>
+        /// <param name="sender">The source of the event</param>
+        /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
         private void Button_Clear_List(object sender, RoutedEventArgs e)
         {
             ComboBoxItem CBIM = (ComboBoxItem)cbxGenerateType.SelectedValue;
@@ -623,10 +688,10 @@ namespace LuAnimatorV2
 
             ListBoxFrames.Items.Clear();
 
-            if (currentForms.ElementAtOrDefault(currentForm) == null)
+            if (animationCollection.ElementAtOrDefault(currentForm) == null)
                 return;
 
-            modeNode mode = currentForms[currentForm].FirstOrDefault(form => form.modeName == state);
+            modeNode mode = animationCollection[currentForm].FirstOrDefault(form => form.modeName == state);
 
             if (mode != null)
             {
@@ -642,7 +707,12 @@ namespace LuAnimatorV2
 
         }
 
-        private void Toggle_Animation_Click(object sender, RoutedEventArgs e)
+        /// <summary>
+        /// (Un-)Pause the animation cycle
+        /// </summary>
+        /// <param name="sender">The source of the event</param>
+        /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
+        private void Button_PauseAnimation(object sender, RoutedEventArgs e)
         {
             var mode = Toggle_Animation.Content.ToString();
 
@@ -659,6 +729,11 @@ namespace LuAnimatorV2
 
         }
 
+        /// <summary>
+        /// Change the animation speed according to user's request
+        /// </summary>
+        /// <param name="sender">The source of the event</param>
+        /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
         private void animationSpeedChanged(object sender, RoutedEventArgs e)
         {
             if (tbxAnimSpeed.Value.HasValue)
@@ -668,6 +743,11 @@ namespace LuAnimatorV2
 
         }
 
+        /// <summary>
+        /// Change the current mode and emoting according to user's request
+        /// </summary>
+        /// <param name="sender">The source of the event</param>
+        /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
         private void ComboBox_Selection_Changed(object sender, EventArgs e)
         {
             if (ListBoxFrames == null || chkLoop == null || chkInvisible == null || cbxGenerateEmote == null || cbxGenerateType == null || cbxGenerateType.SelectedIndex == -1 || cbxGenerateEmote.SelectedIndex == -1)
@@ -700,15 +780,15 @@ namespace LuAnimatorV2
             {
                 case "Sitting_Down":
                 case "Sit":
-                    imgPreviewCharacter.Source = new BitmapImage(new Uri(@"Resources/sit.png", UriKind.Relative));
+                    imgPreviewCharacter.Source = new BitmapImage(new Uri(@"Resources/CharacterPreview/sit.png", UriKind.Relative));
                     break;
 
                 case "Crouch":
-                    imgPreviewCharacter.Source = new BitmapImage(new Uri(@"Resources/duck.png", UriKind.Relative));
+                    imgPreviewCharacter.Source = new BitmapImage(new Uri(@"Resources/CharacterPreview/duck.png", UriKind.Relative));
                     break;
 
                 default:
-                    imgPreviewCharacter.Source = new BitmapImage(new Uri(@"Resources/stand.png", UriKind.Relative));
+                    imgPreviewCharacter.Source = new BitmapImage(new Uri(@"Resources/CharacterPreview/stand.png", UriKind.Relative));
                     break;
             }
 
@@ -718,6 +798,11 @@ namespace LuAnimatorV2
             ModifyPosition();
         }
 
+        /// <summary>
+        /// Change the current layer according to user's request
+        /// </summary>
+        /// <param name="sender">The source of the event</param>
+        /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
         private void Layer_Changed(object sender, EventArgs e)
         {
             if (!Animation_Layer.IsLoaded)
@@ -740,6 +825,11 @@ namespace LuAnimatorV2
             Advanced_Load();
         }
 
+        /// <summary>
+        /// Keyboard event handler: move the image around or execute standart shortcuts
+        /// </summary>
+        /// <param name="sender">The source of the event</param>
+        /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
         private void Grid_PreviewKeyDown(object sender, KeyEventArgs e)
         {
             
@@ -788,11 +878,22 @@ namespace LuAnimatorV2
         #endregion
 
         #region Form Selector
+
+        /// <summary>
+        /// Next form button handler
+        /// </summary>
+        /// <param name="sender">The source of the event</param>
+        /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
         private void Button_Form_Left(object sender, RoutedEventArgs e)
         {
             SetForm(Math.Max(currentForm - 1, 0));
         }
 
+        /// <summary>
+        /// Previous form button handler
+        /// </summary>
+        /// <param name="sender">The source of the event</param>
+        /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
         private void Button_Form_Right(object sender, RoutedEventArgs e)
         {
             SetForm(currentForm + 1);
@@ -827,12 +928,17 @@ namespace LuAnimatorV2
 
         #endregion
 
-        #region Main Buttons events
+        #region Menu Buttons
 
+        /// <summary>
+        /// A handler for New File menu option
+        /// </summary>
+        /// <param name="sender">The source of the event</param>
+        /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
         private void New_Click(object sender, RoutedEventArgs e)
         {
             Advanced_Save();
-            if (AskUserToSave(sender))
+            if (AskUserToSave())
             {
                 CleanUP();
                 previousEmote = "idle";
@@ -844,6 +950,11 @@ namespace LuAnimatorV2
             }
         }
 
+        /// <summary>
+        /// A handler for Save File menu option
+        /// </summary>
+        /// <param name="sender">The source of the event</param>
+        /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
         private void Save_Click(object sender, RoutedEventArgs e)
         {
             SaveFileDialog sfd = new SaveFileDialog();
@@ -855,20 +966,24 @@ namespace LuAnimatorV2
             {
                 Advanced_Save();
 
-                Thread awaiting = CreateWindow("Saving...");
+                Thread awaiting = OpenProgressBarWindow("Saving...");
 
-                File.WriteAllText(sfd.FileName, FileGenerator.Save(currentForms));
+                File.WriteAllText(sfd.FileName, FileGenerator.ToJson(animationCollection));
 
                 awaiting.Abort();
                 isSaved = true;
             }            
         }
 
-
+        /// <summary>
+        /// A handler for Open File menu option
+        /// </summary>
+        /// <param name="sender">The source of the event</param>
+        /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
         public void Open_Click(object sender, RoutedEventArgs e)
         {
             Advanced_Save();
-            if (AskUserToSave(sender))
+            if (AskUserToSave())
             {
 
                 OpenFileDialog ofd = new OpenFileDialog();
@@ -878,8 +993,8 @@ namespace LuAnimatorV2
 
                 if (ofd.ShowDialog() == true)
                 {
-                    Thread awaiting = CreateWindow("Loading " + Path.GetFileName(ofd.FileName) + "\nThis will take a while");
-                    AnimationCollection temp = FileGenerator.Load(ofd.FileName);
+                    Thread awaiting = OpenProgressBarWindow("Loading " + Path.GetFileName(ofd.FileName) + "\nThis will take a while");
+                    AnimationCollection temp = FileGenerator.ToAnimationCollection(ofd.FileName);
 
                     if (temp == null)
                     {
@@ -892,7 +1007,7 @@ namespace LuAnimatorV2
                         CleanUP();
                         currentForm = 0;
                         ListBoxFrames.Items.Clear();
-                        currentForms = temp;
+                        animationCollection = temp;
                         SetForm(0);
 
                         awaiting.Abort();
@@ -901,31 +1016,67 @@ namespace LuAnimatorV2
             }
         }
 
+        /// <summary>
+        /// A handler for Exit menu option: closes the application
+        /// </summary>
+        /// <param name="sender">The source of the event</param>
+        /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
         private void Exit_Click(object sender, RoutedEventArgs e)
         {
             Advanced_Save();
             this.Close();
         }
 
-        #endregion
-
+        /// <summary>
+        /// A handler for Guid menu option: redirects user to the guide on iLoveBacon's showcase
+        /// </summary>
+        /// <param name="sender">The source of the event</param>
+        /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
         private void Guide_Click(object sender, RoutedEventArgs e)
         {
             System.Diagnostics.Process.Start("http://ilovebacons.com/showcase/luanimator-v3-1-01.228/");
         }
 
+        /// <summary>
+        /// A handler for Donate menu option : redirects user to the PayPal.Me page
+        /// </summary>
+        /// <param name="sender">The source of the event</param>
+        /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
         private void Donate_Click(object sender, RoutedEventArgs e)
         {
             System.Diagnostics.Process.Start("https://www.paypal.me/degranon");
         }
 
+        /// <summary>
+        /// A handler for Abot menu option: shows the information about the app
+        /// </summary>
+        /// <param name="sender">The source of the event</param>
+        /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
         private void About_Click(object sender, RoutedEventArgs e)
         {
-            About a = new About();
+            AboutWindow a = new AboutWindow();
             a.Show();
         }
 
-        private Thread CreateWindow(string title)
+        /// <summary>
+        /// A handler for Update menu option: checks for availabe updates.
+        /// Application does this on its own in the beginning
+        /// </summary>
+        /// <param name="sender">The source of the event</param>
+        /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
+        private void Update_Click(object sender, RoutedEventArgs e)
+        {
+            InstallUpdateSyncWithInfo(true);
+        }
+
+        #endregion
+
+        /// <summary>
+        /// Opens a progress bar box, so user could see the process running
+        /// </summary>
+        /// <param name="title">Title of the box</param>
+        /// <returns>Thread running the bar</returns>
+        private Thread OpenProgressBarWindow(string title)
         {
             Thread awaiting = new Thread(new ThreadStart(() =>
             {
@@ -949,14 +1100,31 @@ namespace LuAnimatorV2
             return awaiting;
         }
 
-        private bool AskUserToSave(object sender)
+
+
+        /// <summary>
+        /// Returns whether the given path is a valid image
+        /// </summary>
+        /// <param name="path">The path to check for validity</param>
+        /// <returns>True if the given string is an image.</returns>
+        public static bool IsValidImage(string path)
+        {
+            return Convert.ToBoolean(path.ToLower().IndexOf(".png") + path.ToLower().IndexOf(".jpg") + path.ToLower().IndexOf(".jpeg") + 3); // Tricky way to convert -3 (if not an image) to zero.
+        }
+
+
+        /// <summary>
+        /// Ask user if they want to save their project before exititing / starting a new one
+        /// </summary>
+        /// <returns>false if user cancelled his action; true otherwise</returns>
+        private bool AskUserToSave()
         {
             if (!isSaved)
             {
                 MessageBoxResult mbr = MessageBox.Show("The project is unsaved. Do you want to save it first?", "Warning", MessageBoxButton.YesNoCancel);
                 if (mbr == MessageBoxResult.Yes)
                 {
-                    Save_Click(sender, null);
+                    Save_Click(null, null);
                 }
                 else if (mbr == MessageBoxResult.Cancel)
                     return false;
@@ -964,13 +1132,23 @@ namespace LuAnimatorV2
             return true;
         }
 
-        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        /// <summary>
+        /// Ask user to save his project before exiting the application
+        /// </summary>
+        /// <param name="sender">The source of the event</param>
+        /// <param name="e">The <see cref="System.ComponentModel.CancelEventArgs"/> instance containing the event data.</param>
+        protected void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            if (!AskUserToSave(sender))
+            Advanced_Save();
+            if (!AskUserToSave())
                 e.Cancel = true;
         }
 
-        private void InstallUpdateSyncWithInfo()
+        /// <summary>
+        /// Check the application for updates and update if selected
+        /// </summary>
+        /// <param name="isRequested">Checking whether the user asked for the update or it was done at the start.</param>
+        private void InstallUpdateSyncWithInfo(bool isRequested)
         {
             UpdateCheckInfo info = null;
 
@@ -985,17 +1163,18 @@ namespace LuAnimatorV2
                 }
                 catch (DeploymentDownloadException dde)
                 {
-                    MessageBox.Show("The new version of the application cannot be downloaded at this time. \n\nPlease check your network connection, or try again later. Error: " + dde.Message);
+                    if (isRequested)
+                        MessageBox.Show("The new version of the application cannot be downloaded at this time. \n\nPlease check your network connection, or try again later. Error: " + dde.Message, "Error");
                     return;
                 }
                 catch (InvalidDeploymentException ide)
                 {
-                    MessageBox.Show("Cannot check for a new version of the application. The ClickOnce deployment is corrupt. Please redeploy the application and try again. Error: " + ide.Message);
+                    MessageBox.Show("Cannot check for a new version of the application. The ClickOnce deployment is corrupt. Please redeploy the application and try again. Error: " + ide.Message, "Error");
                     return;
                 }
                 catch (InvalidOperationException ioe)
                 {
-                    MessageBox.Show("This application cannot be updated. It is likely not a ClickOnce application. Error: " + ioe.Message);
+                    MessageBox.Show("This application cannot be updated. It is likely not a ClickOnce application. Error: " + ioe.Message, "Error");
                     return;
                 }
 
@@ -1024,9 +1203,9 @@ namespace LuAnimatorV2
                     {
                         try
                         {
-                            ad.Update();
                             MessageBox.Show("The application has been upgraded, you may now restart.");
                             this.Close();
+                            ad.Update();
                         }
                         catch (DeploymentDownloadException dde)
                         {
@@ -1036,7 +1215,13 @@ namespace LuAnimatorV2
                     }
                 }
             }
+            else
+            {
+                if (isRequested)
+                {
+                    MessageBox.Show("No update available for now", "No update available");
+                }
+            }
         }
-
     }
 }

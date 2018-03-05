@@ -23,16 +23,51 @@
             <!-- Menu -->
             <Menu VerticalAlignment="Top">
                 <MenuItem Header="File">
-                    <MenuItem Header="New Project..." Click="New_Click"/>
-                    <MenuItem Header="Open Project..." Click="Open_Click"/>
-                    <MenuItem Header="Save Project..." Click="Save_Click"/>
+                    <MenuItem Header="New Project..." Click="New_Click">
+                        <MenuItem.Icon>
+                            <ContentControl Content="{StaticResource NewIcon}" Margin="0" />
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <MenuItem Header="Open Project..." Click="Open_Click">
+                        <MenuItem.Icon>
+                            <ContentControl Content="{StaticResource OpenIcon}" Margin="0" />
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <MenuItem Header="Save Project..." Click="Save_Click">
+                        <MenuItem.Icon>
+                            <ContentControl Content="{StaticResource SaveIcon}" Margin="0" />
+                        </MenuItem.Icon>
+                    </MenuItem>
                     <Separator />
-                    <MenuItem Header="Exit" Click="Exit_Click"/>
+                    <MenuItem Header="Exit" Click="Exit_Click">
+                        <MenuItem.Icon>
+                            <ContentControl Content="{StaticResource ExitIcon}" Margin="0" />
+                        </MenuItem.Icon>
+                    </MenuItem>
                 </MenuItem>
                 <MenuItem Header="Help">
-                    <MenuItem Header="Guide" Click="Guide_Click"/>
-                    <MenuItem Header="About" Click="About_Click"/>
-                    <MenuItem Header="Donate" Click="Donate_Click" Foreground="DeepPink"/>
+                    <MenuItem Header="Check for updates" Click="Update_Click">
+                        <MenuItem.Icon>
+                            <ContentControl Content="{StaticResource UpdateIcon}" Margin="0" />
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <Separator />
+                    <MenuItem Header="Guide" Click="Guide_Click">
+                        <MenuItem.Icon>
+                            <ContentControl Content="{StaticResource GuideIcon}" Margin="0" />
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <MenuItem Header="About" Click="About_Click">
+                        <MenuItem.Icon>
+                            <ContentControl Content="{StaticResource HelpIcon}" Margin="0" />
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <Separator />
+                    <MenuItem Header="Donate" Click="Donate_Click" Foreground="DeepPink">
+                        <MenuItem.Icon>
+                            <ContentControl Content="{StaticResource DonateIcon}" Margin="0" />
+                        </MenuItem.Icon>
+                    </MenuItem>
                 </MenuItem>
             </Menu>
             <!-- /Menu -->
@@ -53,16 +88,11 @@
                         MouseDown="Preview_MouseDown" MouseMove="Preview_MouseMove" MouseUp="Preview_MouseUp">
                     <Grid Name="gridPreview" Width="394" Height="373" ClipToBounds="True">
                         <Image Name="imgPreviewBackground"
-				           Source="Resources/City.png"
+				           Source="Resources/BackgroundPreview/City.png"
 				           Width="394" Height="373">
-                            <Image.Resources>
-                                <Image x:Key="Natural" Source="Resources/City.png"/>
-                                <Image x:Key="Light" Source="Resources/GreenWall.png"/>
-                                <Image x:Key="Dark" Source="Resources/DarkSmall.png"/>
-                            </Image.Resources>
                         </Image>
                         <Image Name="imgPreviewCharacter"
-				           Source="Resources/stand.png"
+				           Source="Resources/CharacterPreview/stand.png"
 				           Stretch="None" HorizontalAlignment="Left" VerticalAlignment="Top"
 				           Margin="177,274,0,0"/>
                         <Image Name="imgPreview"
@@ -83,7 +113,7 @@
                                 <Button Name="btnThemeDark" Width="15" Height="15" Tag="Dark" BorderBrush="#404040" BorderThickness="1"  Background="#272727" Click="ThemeBlack_MouseLeftButtonDown"/>
                             </Border>
                         </StackPanel>
-                        <Button x:Name="Toggle_Animation" Content="Pause" Click="Toggle_Animation_Click" Margin="5" Height="20" Width="100"
+                        <Button x:Name="Toggle_Animation" Content="Pause" Click="Button_PauseAnimation" Margin="5" Height="20" Width="100"
                                 VerticalAlignment="Top" HorizontalAlignment="Left"/>
                         <StackPanel Orientation="Horizontal" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="5">
                             <Label Content="X:"/>

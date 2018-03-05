@@ -1,22 +1,32 @@
-﻿using DrawablesGeneratorTool;
-using Microsoft.Win32;
-using Silverfeelin.StarboundDrawables;
-using System;
-using System.Collections.ObjectModel;
+﻿using System;
 using System.IO;
 using Newtonsoft.Json.Linq;
 using System.Windows.Media.Imaging;
 using System.Drawing;
 using System.Linq;
 
+using Silverfeelin.StarboundDrawables;
+using DrawablesGeneratorTool;
+
+using FormCollection = System.Collections.ObjectModel.ObservableCollection<LuAnimatorV2.modeNode>;
+using AnimationCollection = System.Collections.ObjectModel.ObservableCollection<System.Collections.ObjectModel.ObservableCollection<LuAnimatorV2.modeNode>>;
+
 namespace LuAnimatorV2
 {
+    /// <summary>
+    /// Saves and loads the luanimation projects
+    /// </summary>
     class FileGenerator
     {
-        private static string SingleTextureGenerator(BitmapSource bsource, int xposition, int yposition)
+        /// <summary>
+        /// Generate the starbound single texture directive by the given frame
+        /// </summary>
+        /// <param name="bsource">A frame to create directives from</param>
+        /// <returns>The directive string</returns>
+        protected static string GenerateDirective(BitmapSource bsource)
         {
-            Bitmap bmp = BitmapConverter.ToWinFormsBitmap(bsource);
-            DrawablesGenerator generator = new DrawablesGenerator(BitmapConverter.ToWinFormsBitmap(bsource));
+            Bitmap bmp = BitmapConverter.BitmapSourceToBitmap(bsource);
+            DrawablesGenerator generator = new DrawablesGenerator(BitmapConverter.BitmapSourceToBitmap(bsource));
             bmp.Dispose();
             generator = DrawableUtilities.SetUpGenerator(generator, 0, 0);
             generator.ReplaceBlank = true;
@@ -28,12 +38,16 @@ namespace LuAnimatorV2
 
         }
 
-
-        public static string Save(ObservableCollection<ObservableCollection<modeNode>> file)
+        /// <summary>
+        /// Create Json object by the animation collection
+        /// </summary>
+        /// <param name="animationCollection">Animation</param>
+        /// <returns>Json containing line, ready to be saved</returns>
+        public static string ToJson(AnimationCollection animationCollection)
         {
             JArray animationJSON = new JArray();
 
-            foreach (ObservableCollection<modeNode> form in file)
+            foreach (FormCollection form in animationCollection)
             {
                 JObject jsonJSON = new JObject();
                 foreach (modeNode mode in form)
@@ -61,7 +75,7 @@ namespace LuAnimatorV2
                         {
                             foreach (BitmapSource imglst in emote.frames)
                             {
-                                jsonFrames[i.ToString()] = SingleTextureGenerator(imglst, 0, 0);
+                                jsonFrames[i.ToString()] = GenerateDirective(imglst);
                                 i += emote.speed;
                             }
                             jsonEmote["frames"] = jsonFrames;
@@ -71,7 +85,7 @@ namespace LuAnimatorV2
                         {
                             foreach (BitmapSource imglst in emote.fullbrightFrames)
                             {
-                                jsonFFrames[j.ToString()] = SingleTextureGenerator(imglst, 0, 0);
+                                jsonFFrames[j.ToString()] = GenerateDirective(imglst);
                                 j += emote.speed;
                             }
                             jsonEmote["fullbrightFrames"] = jsonFFrames;
@@ -114,9 +128,14 @@ namespace LuAnimatorV2
             return animationJSON.ToString(Newtonsoft.Json.Formatting.Indented);
         }
 
-        public static ObservableCollection<ObservableCollection<modeNode>> Load(string path)
+        /// <summary>
+        /// Generates the 
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        public static AnimationCollection ToAnimationCollection(string path)
         {
-            ObservableCollection<ObservableCollection<modeNode>> animation = new ObservableCollection<ObservableCollection<modeNode>>();
+            AnimationCollection animation = new AnimationCollection();
 
             JToken settings = JToken.Parse(File.ReadAllText(path));
             int currentForm = -1;
@@ -127,7 +146,7 @@ namespace LuAnimatorV2
                 {
                     currentForm++;
                     if (animation.ElementAtOrDefault(currentForm) == null)
-                        animation.Add(new ObservableCollection<modeNode>());
+                        animation.Add(new FormCollection());
 
                     foreach (JProperty jState in jForm)
                     {
@@ -179,7 +198,7 @@ namespace LuAnimatorV2
                                     Bitmap bmp = new Bitmap(64, 64);
                                     StarCheatReloaded.GUI.Directive.ApplyDirectives(ref bmp, directive);
 
-                                    frames[i++] = BitmapConverter.loadBitmap(bmp);
+                                    frames[i++] = BitmapConverter.BitmapToBitmapSource(bmp);
                                     bmp.Dispose();
                                 }
 
@@ -195,7 +214,7 @@ namespace LuAnimatorV2
                                     Bitmap bmp = new Bitmap(64, 64);
                                     StarCheatReloaded.GUI.Directive.ApplyDirectives(ref bmp, directive);
 
-                                    fullbrightFrames[i++] = BitmapConverter.loadBitmap(bmp);
+                                    fullbrightFrames[i++] = BitmapConverter.BitmapToBitmapSource(bmp);
                                     bmp.Dispose();
                                 }
 

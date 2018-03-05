@@ -6,12 +6,19 @@ namespace LuAnimatorV2
     /// <summary>
     /// Логика взаимодействия для About.xaml
     /// </summary>
-    public partial class About : Window
+    public partial class AboutWindow : Window
     {
-        public About()
+        public AboutWindow()
         {
             InitializeComponent();
 
+            WindowStartupLocation = WindowStartupLocation.CenterScreen;
+
+            FillInInfo();
+        }
+
+        private void FillInInfo()
+        {
             Assembly app = Assembly.GetExecutingAssembly();
 
             AssemblyTitleAttribute title = (AssemblyTitleAttribute)app.GetCustomAttributes(typeof(AssemblyTitleAttribute), false)[0];

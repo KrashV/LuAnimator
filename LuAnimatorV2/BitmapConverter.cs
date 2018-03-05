@@ -1,13 +1,20 @@
 ﻿using System.Drawing;
 using System.Drawing.Imaging;
-using System.IO;
 using System.Windows.Media.Imaging;
 
 namespace LuAnimatorV2
 {
+    /// <summary>
+    /// Converter between <see cref="Bitmap"/> and <see cref="BitmapSource"/>/>
+    /// </summary>
     static class BitmapConverter
     {
-        public static Bitmap ToWinFormsBitmap(this BitmapSource bitmapsource)
+        /// <summary>
+        /// Convert <see cref="BitmapSource"/> into <see cref="Bitmap"/>
+        /// </summary>
+        /// <param name="bitmapsource">BitmapSource object to convert</param>
+        /// <returns>Converted Bitmap</returns>
+        public static Bitmap BitmapSourceToBitmap(BitmapSource bitmapsource)
         {
             Bitmap bmp = new Bitmap(
               bitmapsource.PixelWidth,
@@ -29,15 +36,20 @@ namespace LuAnimatorV2
         [System.Runtime.InteropServices.DllImport("gdi32")]
         static extern int DeleteObject(System.IntPtr o);
 
-        public static BitmapSource loadBitmap(System.Drawing.Bitmap source)
+        /// <summary>
+        /// Convert <see cref="Bitmap"/> into <see cref="BitmapSource"/>
+        /// </summary>
+        /// <param name="source">Bitma object to convert</param>
+        /// <returns>BitmapSouce of the given Bitmap</returns>
+        public static BitmapSource BitmapToBitmapSource(Bitmap bitmap)
         {
-            System.IntPtr ip = source.GetHbitmap();
+            System.IntPtr ip = bitmap.GetHbitmap();
             BitmapSource bs = null;
             try
             {
                 bs = System.Windows.Interop.Imaging.CreateBitmapSourceFromHBitmap(ip,
                    System.IntPtr.Zero, System.Windows.Int32Rect.Empty,
-                   System.Windows.Media.Imaging.BitmapSizeOptions.FromEmptyOptions());
+                   BitmapSizeOptions.FromEmptyOptions());
             }
             finally
             {
