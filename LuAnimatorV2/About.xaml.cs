@@ -43,5 +43,12 @@ namespace LuAnimatorV2
             lblCompany.SetCurrentValue(TextBlock.TextProperty, company.Company);
             lblDisclaimer.SetCurrentValue(TextBlock.TextProperty, "All rights reserved.");
         }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            Button b = sender as Button;
+            System.Diagnostics.Process.Start(b.DataContext.ToString());
+            
+        }
     }
 }

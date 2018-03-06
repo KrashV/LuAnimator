@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
         Title="About LuAnimator" WindowStyle="ToolWindow" Background="AliceBlue"
-        Width="400" Height="220">
+        Width="400" Height="250">
     <Window.Resources>
         <Style x:Key="AboutFont" TargetType="{x:Type TextBlock}">
             <Setter Property="Foreground" Value="Black"/>
@@ -28,7 +28,25 @@
             <TextBlock TextWrapping="WrapWithOverflow" Name="lblCompany"/>
             <TextBlock TextWrapping="WrapWithOverflow" Name="lblDisclaimer"/>
         </StackPanel>
-        <Image VerticalAlignment="Center" HorizontalAlignment="Right" 
+        <Image VerticalAlignment="Top" HorizontalAlignment="Right" 
                Width="150" Height="150" Margin="10" Source="Resources/DegranonLogo.png"/>
+        <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom" HorizontalAlignment="Right">
+        <Button Height="32" Width="32" VerticalAlignment="Bottom" HorizontalAlignment="Right" Margin="10" 
+                Cursor="Hand" Click="Button_Click" DataContext="http://steamcommunity.com/id/Degranon">
+            <Button.Template>
+                <ControlTemplate>
+                    <Image Source="/Resources/steamlogo.png"/>
+                </ControlTemplate>
+            </Button.Template>
+        </Button>
+        <Button Height="32" Width="32" VerticalAlignment="Bottom" HorizontalAlignment="Right" Margin="10" 
+                Cursor="Hand" Click="Button_Click" DataContext="https://github.com/KrashV/LuAnimator">
+            <Button.Template>
+                <ControlTemplate>
+                    <Image Source="/Resources/gitlogo.png"/>
+                </ControlTemplate>
+            </Button.Template>
+        </Button>
+        </StackPanel>
     </Grid>
 </Window>
