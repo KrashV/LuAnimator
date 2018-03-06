@@ -21,12 +21,12 @@
                 <Style BasedOn="{StaticResource AboutFont}" TargetType="{x:Type TextBlock}"/>
             </StackPanel.Resources>
 
-            <TextBlock TextWrapping="WrapWithOverflow" Name="lblName"/>
-            <TextBlock TextWrapping="WrapWithOverflow" Name="lblDescription"/>
-            <TextBlock TextWrapping="WrapWithOverflow" Name="lblVersion"/>
-            <TextBlock TextWrapping="WrapWithOverflow" Name="lblCopyright"/>
-            <TextBlock TextWrapping="WrapWithOverflow" Name="lblCompany"/>
-            <TextBlock TextWrapping="WrapWithOverflow" Name="lblDisclaimer"/>
+            <TextBlock TextWrapping="WrapWithOverflow" Name="lblName" Text="{Binding NameProperty}"/>
+            <TextBlock TextWrapping="WrapWithOverflow" Name="lblDescription" Text="{Binding DescriptionPropery}"/>
+            <TextBlock TextWrapping="WrapWithOverflow" Name="lblVersion" Text="{Binding VersionPropery}"/>
+            <TextBlock TextWrapping="WrapWithOverflow" Name="lblCopyright" Text="{Binding CopyrightPropery}"/>
+            <TextBlock TextWrapping="WrapWithOverflow" Name="lblCompany" Text="{Binding CompanyPropery}"/>
+            <TextBlock TextWrapping="WrapWithOverflow" Name="lblDisclaimer"  Text="{Binding DisclaimerPropery}"/>
         </StackPanel>
         <Image VerticalAlignment="Center" HorizontalAlignment="Right" 
                Width="150" Height="150" Margin="10" Source="Resources/DegranonLogo.png"/>

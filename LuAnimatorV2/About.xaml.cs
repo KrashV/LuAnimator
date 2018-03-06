@@ -1,5 +1,6 @@
 ﻿using System.Windows;
 using System.Reflection;
+using System.Windows.Controls;
 
 namespace LuAnimatorV2
 {
@@ -34,13 +35,13 @@ namespace LuAnimatorV2
                 version = System.Deployment.Application.ApplicationDeployment.CurrentDeployment.CurrentVersion;
             }
 
-            Title = System.String.Format("About {0}", title.Title);
-            lblName.Text = title.Title;
-            lblDescription.Text = description.Description;
-            lblVersion.Text = System.String.Format("Version {0}", version.ToString());
-            lblCopyright.Text = copyright.Copyright.ToString();
-            lblCompany.Text = company.Company;
-            lblDisclaimer.Text = "All rights reserved.";
+            SetCurrentValue(TitleProperty, System.String.Format("About {0}", title.Title));
+            lblName.SetCurrentValue(TextBlock.TextProperty, title.Title);
+            lblDescription.SetCurrentValue(TextBlock.TextProperty, description.Description);
+            lblVersion.SetCurrentValue(TextBlock.TextProperty, System.String.Format("Version {0}", version.ToString()));
+            lblCopyright.SetCurrentValue(TextBlock.TextProperty, copyright.Copyright.ToString());
+            lblCompany.SetCurrentValue(TextBlock.TextProperty, company.Company);
+            lblDisclaimer.SetCurrentValue(TextBlock.TextProperty, "All rights reserved.");
         }
     }
 }

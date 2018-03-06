@@ -56,7 +56,6 @@ namespace LuAnimatorV2
             InitializeImage(imgPreviewF);
             currentImage = imgPreview;
 
-            ListBoxFrames.Focus();
             _timer = new DispatcherTimer();
             TimeSpan span = TimeSpan.FromMilliseconds(animationSpeed * 1000.0 / 60.0);
             _timer.Interval = span;
@@ -71,8 +70,9 @@ namespace LuAnimatorV2
 
         private void InitializeImage(System.Windows.Controls.Image img)
         {
-            img.Margin = DEFAULT_MARGIN;
-            img.Height = img.Width = 0;
+            img.SetCurrentValue(MarginProperty, DEFAULT_MARGIN);
+            img.SetCurrentValue(HeightProperty, (double)0);
+            img.SetCurrentValue(WidthProperty, (double)0);
         }
 
         #region Animating
@@ -94,7 +94,7 @@ namespace LuAnimatorV2
             }
             else
             {
-                currentImage.Source = null;
+                currentImage.SetCurrentValue(System.Windows.Controls.Image.SourceProperty, null);
             }
 
             System.Windows.Controls.Image backImage = currentImage == imgPreview ? imgPreviewF : imgPreview;
@@ -118,17 +118,17 @@ namespace LuAnimatorV2
                         }
                         else
                         {
-                            backImage.Source = null;
+                            backImage.SetCurrentValue(System.Windows.Controls.Image.SourceProperty, null);
                         }
                     }
                     else
                     {
-                        backImage.Source = null;
+                        backImage.SetCurrentValue(System.Windows.Controls.Image.SourceProperty, null);
                     }
                 }
                 else
                 {
-                    backImage.Source = null;
+                    backImage.SetCurrentValue(System.Windows.Controls.Image.SourceProperty, null);
                 }
             }
 
@@ -147,7 +147,7 @@ namespace LuAnimatorV2
             {
                 BitmapSource bi = il[currentFrame];
 
-                img.Source = bi;
+                img.SetCurrentValue(System.Windows.Controls.Image.SourceProperty, bi);
 
                 double scale;
                 if (tbxframeSize.Value == null)
@@ -155,8 +155,8 @@ namespace LuAnimatorV2
                 else
                     scale = (double)tbxframeSize.Value;
 
-                img.Width = bi.PixelWidth * 2 * scale;
-                img.Height = bi.PixelHeight * 2 * scale;
+                img.SetCurrentValue(WidthProperty, bi.PixelWidth * 2 * scale);
+                img.SetCurrentValue(HeightProperty, bi.PixelHeight * 2 * scale);
                 ModifyPosition();
             }
         }
@@ -289,7 +289,7 @@ namespace LuAnimatorV2
             if (resourcePath.IndexOf("/") == 0)
                 resourcePath = resourcePath.Substring(1);
 
-            imgPreviewBackground.Source = new BitmapImage(new Uri(@"Resources/BackgroundPreview/" + resourcePath, UriKind.Relative));
+            imgPreviewBackground.SetCurrentValue(System.Windows.Controls.Image.SourceProperty, new BitmapImage(new Uri(@"Resources/BackgroundPreview/" + resourcePath, UriKind.Relative)));
         }
 
         #endregion
@@ -304,8 +304,8 @@ namespace LuAnimatorV2
             xtranslation = (int)pos.X - (int)DEFAULT_MARGIN.Left;
             ytranslation = (int)DEFAULT_MARGIN.Top - (int)pos.Y;
 
-            tbxXPos.Text = xtranslation.ToString();
-            tbxYPos.Text = ytranslation.ToString();
+            tbxXPos.SetCurrentValue(Xceed.Wpf.Toolkit.Primitives.InputBase.TextProperty, xtranslation.ToString());
+            tbxYPos.SetCurrentValue(Xceed.Wpf.Toolkit.Primitives.InputBase.TextProperty, ytranslation.ToString());
         }
         /// <summary>
         /// Starts capturing the mouse for the preview window, to update the position of the image in the Preview_MouseMove event.
@@ -340,12 +340,12 @@ namespace LuAnimatorV2
 
         private void ModifyPosition(System.Windows.Controls.Image img)
         {
-            img.Margin = new Thickness(
+            img.SetCurrentValue(MarginProperty, new Thickness(
                 (int)DEFAULT_MARGIN.Left - img.Width + xtranslation,
                 (int)DEFAULT_MARGIN.Top - img.Height - ytranslation,
                 (int)DEFAULT_MARGIN.Right - img.Width - xtranslation,
                 (int)DEFAULT_MARGIN.Bottom - img.Height + ytranslation
-                );
+                ));
         }
 
         /// <summary>
@@ -368,7 +368,7 @@ namespace LuAnimatorV2
             else
             {
                 xtranslation = 0;
-                tbxXPos.Value = 0;
+                tbxXPos.SetCurrentValue(Xceed.Wpf.Toolkit.Primitives.UpDownBase<int?>.ValueProperty, 0);
             }
 
             if (tbxYPos.Value != null)
@@ -376,7 +376,7 @@ namespace LuAnimatorV2
             else
             {
                 ytranslation = 0;
-                tbxYPos.Value = 0;
+                tbxYPos.SetCurrentValue(Xceed.Wpf.Toolkit.Primitives.UpDownBase<int?>.ValueProperty, 0);
             }
 
             ModifyPosition();
@@ -454,7 +454,7 @@ namespace LuAnimatorV2
             if (animationCollection.ElementAtOrDefault(currentForm) == null)
             {
                 animationCollection.Add(new FormCollection());
-                soundName.Text = "";
+                soundName.SetCurrentValue(TextBox.TextProperty, "");
             }
 
             ComboBoxItem CBIM = (ComboBoxItem)cbxGenerateType.SelectedValue;
@@ -470,25 +470,25 @@ namespace LuAnimatorV2
             {
                 emoteNode emote = oldmode.emotes.FirstOrDefault(form => form.name == emotestate);
 
-                tbxXPos.Text = oldmode.xtranslation.ToString();
-                tbxYPos.Text = oldmode.ytranslation.ToString();
-                tbxframeSize.Value = oldmode.framescale;
-                chkInvisible.IsChecked = oldmode.invisible;
+                tbxXPos.SetCurrentValue(Xceed.Wpf.Toolkit.Primitives.InputBase.TextProperty, oldmode.xtranslation.ToString());
+                tbxYPos.SetCurrentValue(Xceed.Wpf.Toolkit.Primitives.InputBase.TextProperty, oldmode.ytranslation.ToString());
+                tbxframeSize.SetCurrentValue(Xceed.Wpf.Toolkit.Primitives.UpDownBase<double?>.ValueProperty, oldmode.framescale);
+                chkInvisible.SetCurrentValue(System.Windows.Controls.Primitives.ToggleButton.IsCheckedProperty, oldmode.invisible);
                 xtranslation = oldmode.xtranslation;
                 ytranslation = oldmode.ytranslation;
 
 
                 if (emote != null)
                 {
-                    chkLoop.IsChecked = emote.looping;
-                    chkSoundLoop.IsChecked = emote.soundLoop;
+                    chkLoop.SetCurrentValue(System.Windows.Controls.Primitives.ToggleButton.IsCheckedProperty, emote.looping);
+                    chkSoundLoop.SetCurrentValue(System.Windows.Controls.Primitives.ToggleButton.IsCheckedProperty, emote.soundLoop);
 
                     animationSpeed = emote.speed;
-                    tbxAnimSpeed.Value = emote.speed;
-                    tbxSoundInterval.Value = emote.soundInterval;
-                    tbxSoundPitch.Value = emote.soundPitch;
-                    tbxSoundVolume.Value = emote.soundVolume;
-                    soundName.Text = emote.sound != null ? String.Join(" ", emote.sound) : "";
+                    tbxAnimSpeed.SetCurrentValue(Xceed.Wpf.Toolkit.Primitives.UpDownBase<int?>.ValueProperty, emote.speed);
+                    tbxSoundInterval.SetCurrentValue(Xceed.Wpf.Toolkit.Primitives.UpDownBase<double?>.ValueProperty, emote.soundInterval);
+                    tbxSoundPitch.SetCurrentValue(Xceed.Wpf.Toolkit.Primitives.UpDownBase<double?>.ValueProperty, emote.soundPitch);
+                    tbxSoundVolume.SetCurrentValue(Xceed.Wpf.Toolkit.Primitives.UpDownBase<double?>.ValueProperty, emote.soundVolume);
+                    soundName.SetCurrentValue(TextBox.TextProperty, emote.sound != null ? String.Join(" ", emote.sound) : "");
 
                     ListBoxFrames.Items.Clear();
                     if (currentImage == imgPreview)
@@ -504,7 +504,7 @@ namespace LuAnimatorV2
                 }
             }
             else
-                soundName.Text = "";
+                soundName.SetCurrentValue(TextBox.TextProperty, "");
         }
 
         #endregion
@@ -524,7 +524,7 @@ namespace LuAnimatorV2
 
             if (openFileDialog.ShowDialog() == true)
             {
-                soundName.Text = ConvertPath(openFileDialog.FileNames);
+                soundName.SetCurrentValue(TextBox.TextProperty, ConvertPath(openFileDialog.FileNames));
                 SetTitleAsSaved(false);
             }
         }
@@ -554,7 +554,7 @@ namespace LuAnimatorV2
                         emote.sound = null;
                     }
                 }
-                soundName.Text = null;
+                soundName.SetCurrentValue(TextBox.TextProperty, null);
                 SetTitleAsSaved(false);
             }
         }
@@ -616,7 +616,7 @@ namespace LuAnimatorV2
         /// <param name="e">The <see cref="MouseEventArgs"/> instance containing the event data.</param>
         private void ListBox_MouseLeave(object sender, MouseEventArgs e)
         {
-            ListBoxFrames.SelectedItem = null;
+            ListBoxFrames.SetCurrentValue(System.Windows.Controls.Primitives.Selector.SelectedItemProperty, null);
         }
 
         /// <summary>
@@ -650,7 +650,7 @@ namespace LuAnimatorV2
         {
             if (chkInvisible.IsLoaded)
             {
-                imgPreviewCharacter.Opacity = 0.5;
+                imgPreviewCharacter.SetCurrentValue(OpacityProperty, 0.5);
                 SetTitleAsSaved(false);
             }
         }
@@ -664,7 +664,7 @@ namespace LuAnimatorV2
         {
             if (chkInvisible.IsLoaded)
             {
-                imgPreviewCharacter.Opacity = 1;
+                imgPreviewCharacter.SetCurrentValue(OpacityProperty, (double)1);
                 SetTitleAsSaved(false);
             }
         }
@@ -728,12 +728,12 @@ namespace LuAnimatorV2
 
             if (mode == "Pause")
             {
-                Toggle_Animation.Content = "Play";
+                Toggle_Animation.SetCurrentValue(ContentProperty, "Play");
                 _timer.Stop();
             }
             else
             {
-                Toggle_Animation.Content = "Pause";
+                Toggle_Animation.SetCurrentValue(ContentProperty, "Pause");
                 _timer.Start();
             }
 
@@ -782,27 +782,29 @@ namespace LuAnimatorV2
 
             if (state == "Activate" || state == "Deactivate" || state == "Sitting_Down" || state == "Standing_Up" || state == "Transform_Next" || state == "Transform_Previous" || state == "Primary_Fire" || state == "Alt_Fire")
             {
-                chkLoop.IsChecked = true;
-                chkLoop.IsEnabled = false;
+                chkLoop.SetCurrentValue(System.Windows.Controls.Primitives.ToggleButton.IsCheckedProperty, true);
+                chkLoop.SetCurrentValue(IsEnabledProperty, false);
             }
             else
-                chkLoop.IsEnabled = true;
+                chkLoop.SetCurrentValue(IsEnabledProperty, true);
 
+            string path;
             switch (state)
             {
                 case "Sitting_Down":
                 case "Sit":
-                    imgPreviewCharacter.Source = new BitmapImage(new Uri(@"Resources/CharacterPreview/sit.png", UriKind.Relative));
+                    path = @"Resources/CharacterPreview/sit.png";
                     break;
 
                 case "Crouch":
-                    imgPreviewCharacter.Source = new BitmapImage(new Uri(@"Resources/CharacterPreview/duck.png", UriKind.Relative));
+                    path = @"Resources/CharacterPreview/duck.png";
                     break;
 
                 default:
-                    imgPreviewCharacter.Source = new BitmapImage(new Uri(@"Resources/CharacterPreview/stand.png", UriKind.Relative));
+                    path = @"Resources/CharacterPreview/stand.png";
                     break;
             }
+            imgPreviewCharacter.SetCurrentValue(System.Windows.Controls.Image.SourceProperty, new BitmapImage(new Uri(path, UriKind.Relative)));
 
             previousModeName = state;
             previousEmoteName = emotestate;
@@ -827,14 +829,14 @@ namespace LuAnimatorV2
             if (currentImage == imgPreview)
             {
                 currentImage = imgPreviewF;
-                imgPreview.Opacity = 0.5;
-                imgPreviewF.Opacity = 1;
+                imgPreview.SetCurrentValue(OpacityProperty, 0.5);
+                imgPreviewF.SetCurrentValue(OpacityProperty, (double)1);
             }
             else
             {
                 currentImage = imgPreview;
-                imgPreviewF.Opacity = 0.5;
-                imgPreview.Opacity = 1;
+                imgPreviewF.SetCurrentValue(OpacityProperty, 0.5);
+                imgPreview.SetCurrentValue(OpacityProperty, (double)1);
             }
             Advanced_Load();
         }
@@ -941,17 +943,18 @@ namespace LuAnimatorV2
 
             currentForm = formNumber;
 
-            tbxCurrentForm.Text = "Form " + (currentForm + 1);
+            
+            tbxCurrentForm.SetCurrentValue(TextBox.TextProperty, "Form " + (currentForm + 1));
 
-            btnLeftForm.IsEnabled = (currentForm != 0);
+            btnLeftForm.SetCurrentValue(IsEnabledProperty, (currentForm != 0));
 
             previousModeName = "Idle";
             previousEmoteName = "idle";
 
             ListBoxFrames.Items.Clear();
 
-            cbxGenerateType.SelectedIndex = 0;
-            cbxGenerateEmote.SelectedIndex = 0;
+            cbxGenerateType.SetCurrentValue(System.Windows.Controls.Primitives.Selector.SelectedIndexProperty, 0);
+            cbxGenerateEmote.SetCurrentValue(System.Windows.Controls.Primitives.Selector.SelectedIndexProperty, 0);
 
             // Loading mode
             Advanced_Load();
@@ -979,7 +982,6 @@ namespace LuAnimatorV2
                 ListBoxFrames.Items.Clear();
                 SetForm(0);
                 fileName = "New animation";
-                this.Title = fileName + " - LuAnimator";
                 SetTitleAsSaved(true);
             }
         }
@@ -1330,11 +1332,11 @@ namespace LuAnimatorV2
         {
             if (!saved)
             {
-                this.Title = this.Title = "*" + fileName + " - LuAnimator";
+                SetCurrentValue(TitleProperty, "*" + fileName + " - LuAnimator");
             }
             else
             {
-                this.Title = this.Title = fileName + " - LuAnimator";
+                SetCurrentValue(TitleProperty, fileName + " - LuAnimator");
             }
             isSaved = saved;
         }
