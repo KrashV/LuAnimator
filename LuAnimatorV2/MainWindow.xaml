@@ -9,7 +9,7 @@
         mc:Ignorable="d"
         Title="LuAnimator v4. Plz Donate."
         Height="560" Width="854" Style="{DynamicResource CustomWindow}" ResizeMode="CanMinimize"
-        Closing="Window_Closing">
+        Closing="Window_Closing" PreviewKeyDown="WindowPreviewKeyDown">
     <!--Bindings-->
     <Window.CommandBindings>
         <CommandBinding Command="local:Commands.New" CanExecute="SaveCommand_CanExecute" Executed="NewCommand_Executed" />
@@ -29,10 +29,10 @@
         
     </Window.Resources>
 
-    <Grid  PreviewKeyDown="Grid_PreviewKeyDown" >
+    <Grid>
         <StackPanel VerticalAlignment="Top">
             <!-- Menu -->
-            <Menu VerticalAlignment="Top">
+            <Menu VerticalAlignment="Top" KeyboardNavigation.TabNavigation="None">
                 <MenuItem Header="File">
                     <MenuItem Header="New Project..." Command="local:Commands.New">
                         <MenuItem.Icon>

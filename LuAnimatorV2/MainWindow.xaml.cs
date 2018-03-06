@@ -848,7 +848,7 @@ namespace LuAnimatorV2
         /// </summary>
         /// <param name="sender">The source of the event</param>
         /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
-        private void Grid_PreviewKeyDown(object sender, KeyEventArgs e)
+        private void WindowPreviewKeyDown(object sender, KeyEventArgs e)
         {
             switch (e.Key)
             {
