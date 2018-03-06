@@ -1300,8 +1300,8 @@ namespace LuAnimatorV2
                         try
                         {
                             MessageBox.Show("The application has been upgraded, you may now restart.");
-                            this.Close();
                             ad.Update();
+                            this.Close();
                         }
                         catch (DeploymentDownloadException dde)
                         {
