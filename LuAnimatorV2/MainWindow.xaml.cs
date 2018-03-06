@@ -484,8 +484,7 @@ namespace LuAnimatorV2
                 chkInvisible.SetCurrentValue(System.Windows.Controls.Primitives.ToggleButton.IsCheckedProperty, oldmode.invisible);
                 xtranslation = oldmode.xtranslation;
                 ytranslation = oldmode.ytranslation;
-
-
+                
                 if (emote != null)
                 {
                     chkLoop.SetCurrentValue(System.Windows.Controls.Primitives.ToggleButton.IsCheckedProperty, emote.looping);
@@ -848,7 +847,7 @@ namespace LuAnimatorV2
         /// </summary>
         /// <param name="sender">The source of the event</param>
         /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
-        private void WindowPreviewKeyDown(object sender, KeyEventArgs e)
+        private void Grid_PreviewKeyDown(object sender, KeyEventArgs e)
         {
             switch (e.Key)
             {
@@ -1302,13 +1301,15 @@ namespace LuAnimatorV2
                         }
                     }
                 }
-                else
+                else if (isRequested)
                 {
-                    if (isRequested)
-                    {
-                        MessageBox.Show("No update available for now", "No update available");
-                    }
+                    MessageBox.Show("You have the latest version of LuAnimator", "No update available");
                 }
+                
+            }
+            else if (isRequested)
+            {
+                MessageBox.Show("You have the latest version of LuAnimator", "No update available");
             }
         }
 
