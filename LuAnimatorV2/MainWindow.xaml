@@ -10,8 +10,17 @@
         Title="LuAnimator v4. Plz Donate."
         Height="560" Width="854" Style="{DynamicResource CustomWindow}" ResizeMode="CanMinimize"
         Closing="Window_Closing">
+    <!--Bindings-->
+    <Window.CommandBindings>
+        <CommandBinding Command="local:Commands.New" CanExecute="SaveCommand_CanExecute" Executed="NewCommand_Executed" />
+        <CommandBinding Command="local:Commands.Open" CanExecute="SaveCommand_CanExecute" Executed="OpenCommand_Executed" />
+        <CommandBinding Command="local:Commands.Save" CanExecute="SaveCommand_CanExecute" Executed="SaveCommand_Executed" />
+        <CommandBinding Command="local:Commands.SaveAs" CanExecute="SaveCommand_CanExecute" Executed="SaveAsCommand_Executed" />
+        <CommandBinding Command="local:Commands.About" CanExecute="SaveCommand_CanExecute" Executed="AboutCommand_Executed" />
+        <CommandBinding Command="local:Commands.DeleteFrame" CanExecute="SaveCommand_CanExecute" Executed="DeleteCommand_Executed" />
+    </Window.CommandBindings>
+
     <Window.Resources>
-        
         <ControlTemplate x:Key="template1">
             <StackPanel>
                 <Rectangle Name="tplImage" Fill="Black" Stretch="Uniform" Width="32" Height="32"/>
@@ -25,23 +34,23 @@
             <!-- Menu -->
             <Menu VerticalAlignment="Top">
                 <MenuItem Header="File">
-                    <MenuItem Header="New Project..." Click="New_Click">
+                    <MenuItem Header="New Project..." Command="local:Commands.New">
                         <MenuItem.Icon>
                             <ContentControl Content="{StaticResource NewIcon}" Margin="0" />
                         </MenuItem.Icon>
                     </MenuItem>
-                    <MenuItem Header="Open Project..." Click="Open_Click">
+                    <MenuItem Header="Open Project..." Command="local:Commands.Open">
                         <MenuItem.Icon>
                             <ContentControl Content="{StaticResource OpenIcon}" Margin="0" />
                         </MenuItem.Icon>
                     </MenuItem>
                     <Separator />
-                    <MenuItem Header="Save Project..." Click="Save_Click">
+                    <MenuItem Header="Save Project..." Command="local:Commands.Save">
                         <MenuItem.Icon>
                             <ContentControl Content="{StaticResource SaveIcon}" Margin="0" />
                         </MenuItem.Icon>
                     </MenuItem>
-                    <MenuItem Header="Save Project As..." Click="Save_As_Click">
+                    <MenuItem Header="Save Project As..." Command="local:Commands.SaveAs">
                         <MenuItem.Icon>
                             <ContentControl Content="{StaticResource SaveAsIcon}" Margin="0" />
                         </MenuItem.Icon>
@@ -65,7 +74,7 @@
                             <ContentControl Content="{StaticResource GuideIcon}" Margin="0" />
                         </MenuItem.Icon>
                     </MenuItem>
-                    <MenuItem Header="About" Click="About_Click">
+                    <MenuItem Header="About" Command="local:Commands.About">
                         <MenuItem.Icon>
                             <ContentControl Content="{StaticResource HelpIcon}" Margin="0" />
                         </MenuItem.Icon>
@@ -272,24 +281,26 @@
                             VerticalAlignment="Center" HorizontalAlignment="Right" Margin="10, 0"
                             BorderThickness="1" Background="{DynamicResource LighterGrayBrush}">
                         <Grid  ClipToBounds="True">
-                            <ScrollViewer HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Hidden" PreviewMouseWheel="HorizontalScrollViewer_PreviewMouseWheel">
+                            <ScrollViewer Focusable="False" HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Hidden" PreviewMouseWheel="HorizontalScrollViewer_PreviewMouseWheel">
                                 <ListBox x:Name="ListBoxFrames" AllowDrop="True" Background="{x:Null}" BorderThickness="0"
-                                   ItemContainerStyle="{x:Null}"
-                                   dd:DragDrop.UseDefaultDragAdorner="True"
-                                   dd:DragDrop.IsDragSource="True"
-                                   dd:DragDrop.IsDropTarget="True"
-                                   DragEnter="ListBox_DragEnter" DragLeave="ListBox_DragLeave" MouseLeave="ListBox_MouseLeave" SelectionMode="Single"
+                                   
+                                         ItemContainerStyle="{x:Null}"
+                                         dd:DragDrop.UseDefaultDragAdorner="True"
+                                         dd:DragDrop.IsDragSource="True"
+                                         dd:DragDrop.IsDropTarget="True"
+                                         SelectionMode="Single"
+                                         Focusable="False"
                                    >
                                     <ListBox.ItemsPanel>
                                         <ItemsPanelTemplate>
-                                            <StackPanel Orientation="Horizontal" Margin="1" />
+                                            <StackPanel Orientation="Horizontal" Margin="1" Focusable="False" />
                                         </ItemsPanelTemplate>
                                     </ListBox.ItemsPanel>
                                     <ListBox.ItemTemplate>
                                         <DataTemplate>
-                                            <StackPanel Orientation="Horizontal">
-                                                <Border Width="80" Height="80" BorderThickness="2" BorderBrush="DarkGray">
-                                                    <Image Source="{Binding}" Width="70" Height="70"/>
+                                            <StackPanel Orientation="Horizontal" Focusable="False">
+                                                <Border Width="80" Height="80" BorderThickness="2" BorderBrush="DarkGray" Focusable="False">
+                                                    <Image Source="{Binding}" Width="70" Height="70" Focusable="False"/>
                                                 </Border>
                                             </StackPanel>
                                         </DataTemplate>

@@ -43,14 +43,16 @@ namespace LuAnimatorV2
 
         private static bool isSaved = true;
         private static string fileName = "New animation";
-        
+
         public MainWindow()
         {
             InitializeComponent();
-            
+
             this.WindowStartupLocation = System.Windows.WindowStartupLocation.CenterScreen;
 
             InstallUpdateSyncWithInfo(false);
+
+            AssigneKeyBindings();
 
             InitializeImage(imgPreview);
             InitializeImage(imgPreviewF);
@@ -66,6 +68,11 @@ namespace LuAnimatorV2
             {
                 SetTitleAsSaved(false);
             };
+        }
+
+        private void AssigneKeyBindings()
+        {
+            var cmd = new RoutedCommand();
         }
 
         private void InitializeImage(System.Windows.Controls.Image img)
@@ -421,7 +428,8 @@ namespace LuAnimatorV2
             if (animationCollection.ElementAtOrDefault(currentForm) == null)
             {
                 FormCollection f = new FormCollection();
-                f.CollectionChanged += new System.Collections.Specialized.NotifyCollectionChangedEventHandler((obj, target) => {
+                f.CollectionChanged += new System.Collections.Specialized.NotifyCollectionChangedEventHandler((obj, target) =>
+                {
                     SetTitleAsSaved(false);
                 });
                 animationCollection.Add(f);
@@ -607,38 +615,6 @@ namespace LuAnimatorV2
                 s.LineRight();
 
             e.Handled = true;
-        }
-
-        /// <summary>
-        /// Set the selected ListBox item to null on mouse leave
-        /// </summary>
-        /// <param name="sender">The source of the event</param>
-        /// <param name="e">The <see cref="MouseEventArgs"/> instance containing the event data.</param>
-        private void ListBox_MouseLeave(object sender, MouseEventArgs e)
-        {
-            ListBoxFrames.SetCurrentValue(System.Windows.Controls.Primitives.Selector.SelectedItemProperty, null);
-        }
-
-        /// <summary>
-        /// Remove the selected item on drag
-        /// </summary>
-        /// <param name="sender">The source of the event</param>
-        /// <param name="e">The <see cref="DragEventArgs"/> instance containing the event data.</param>
-        private void ListBox_DragLeave(object sender, DragEventArgs e)
-        {
-            if (ListBoxFrames.SelectedItem != null)
-                ListBoxFrames.Items.Remove(ListBoxFrames.SelectedItem);
-
-        }
-
-        /// <summary>
-        /// Put the dragged item in the ListBox
-        /// </summary>
-        /// <param name="sender">The source of the event</param>
-        /// <param name="e">The <see cref="DragEventArgs"/> instance containing the event data.</param>
-        private void ListBox_DragEnter(object sender, DragEventArgs e)
-        {
-            if (e.Data.GetDataPresent(DataFormats.FileDrop)) e.Effects = DragDropEffects.Copy;
         }
 
         /// <summary>
@@ -855,41 +831,47 @@ namespace LuAnimatorV2
         }
 
         /// <summary>
+        /// Delete the selectede frame from the list
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void DeleteCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            if (ListBoxFrames.SelectedItem != null)
+            {
+                ListBoxFrames.Items.Remove(ListBoxFrames.SelectedItem);
+            };
+        }
+
+        /// <summary>
         /// Keyboard event handler: move the image around or execute standart shortcuts
         /// </summary>
         /// <param name="sender">The source of the event</param>
         /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
         private void Grid_PreviewKeyDown(object sender, KeyEventArgs e)
         {
-
             switch (e.Key)
             {
                 case Key.S:
                     if (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl))
                     {
-                        if (!Keyboard.IsKeyDown(Key.LeftShift) || !Keyboard.IsKeyDown(Key.RightShift))
-                            Save_Click(sender, null);
-                        else
-                            Save_As_Click(sender, null);
+                        SaveCommand_Executed(sender, null);
                     }
                     break;
                 case Key.O:
                     if (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl))
                     {
-                        Open_Click(sender, null);
+                        OpenCommand_Executed(sender, null);
                     }
                     break;
                 case Key.N:
                     if (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl))
                     {
-                        New_Click(sender, null);
+                        NewCommand_Executed(sender, null);
                     }
                     break;
                 case Key.Delete:
-                    if (ListBoxFrames.SelectedItem != null)
-                    {
-                        ListBoxFrames.Items.Remove(ListBoxFrames.SelectedItem);
-                    };
+                    DeleteCommand_Executed(sender, null);
                     break;
                 case Key.Right:
                     tbxXPos.Value++;
@@ -906,7 +888,6 @@ namespace LuAnimatorV2
             }
             e.Handled = true;
         }
-
         #endregion
 
         #region Form Selector
@@ -943,7 +924,7 @@ namespace LuAnimatorV2
 
             currentForm = formNumber;
 
-            
+
             tbxCurrentForm.SetCurrentValue(TextBox.TextProperty, "Form " + (currentForm + 1));
 
             btnLeftForm.SetCurrentValue(IsEnabledProperty, (currentForm != 0));
@@ -969,8 +950,8 @@ namespace LuAnimatorV2
         /// A handler for New File menu option
         /// </summary>
         /// <param name="sender">The source of the event</param>
-        /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
-        private void New_Click(object sender, RoutedEventArgs e)
+        /// <param name="e">The <see cref="ExecutedRoutedEventArgs"/> instance containing the event data.</param>
+        private void NewCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             Advanced_Save();
             if (AskUserToSave())
@@ -987,30 +968,11 @@ namespace LuAnimatorV2
         }
 
         /// <summary>
-        /// A handler for Save File menu option
+        /// Save the project to the current file
         /// </summary>
         /// <param name="sender">The source of the event</param>
-        /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
-        private void Save_Click(object sender, RoutedEventArgs e)
-        {
-            if (File.Exists(fileName))
-            {
-                Advanced_Save();
-                Thread awaiting = OpenProgressBarWindow("Saving...");
-                File.WriteAllText(fileName, FileGenerator.ToJson(animationCollection));
-                awaiting.Abort();
-                SetTitleAsSaved(true);
-            }
-            else
-                Save_As_Click(sender, e);
-        }
-
-        /// <summary>
-        /// A handler for Save As File menu option
-        /// </summary>
-        /// <param name="sender">The source of the event</param>
-        /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
-        private void Save_As_Click(object sender, RoutedEventArgs e)
+        /// <param name="e">The <see cref="ExecutedRoutedEventArgs"/> instance containing the event data.</param>
+        private void SaveAsCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             SaveFileDialog sfd = new SaveFileDialog();
             sfd.Title = "Save file to...";
@@ -1033,14 +995,36 @@ namespace LuAnimatorV2
             }
         }
 
+        private void SaveCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = true;
+        }
 
+        /// <summary>
+        /// Save the current project
+        /// </summary>
+        /// <param name="sender">The source of the event</param>
+        /// <param name="e">The <see cref="ExecutedRoutedEventArgs"/> instance containing the event data.</param>
+        private void SaveCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            if (File.Exists(fileName))
+            {
+                Advanced_Save();
+                Thread awaiting = OpenProgressBarWindow("Saving...");
+                File.WriteAllText(fileName, FileGenerator.ToJson(animationCollection));
+                awaiting.Abort();
+                SetTitleAsSaved(true);
+            }
+            else
+                SaveAsCommand_Executed(sender, null);
+        }
 
         /// <summary>
         /// A handler for Open File menu option
         /// </summary>
         /// <param name="sender">The source of the event</param>
-        /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
-        public void Open_Click(object sender, RoutedEventArgs e)
+        /// <param name="e">The <see cref="ExecutedRoutedEventArgs"/> instance containing the event data.</param>
+        private void OpenCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             Advanced_Save();
             if (AskUserToSave())
@@ -1110,11 +1094,11 @@ namespace LuAnimatorV2
         }
 
         /// <summary>
-        /// A handler for Abot menu option: shows the information about the app
+        /// Show the information about the program
         /// </summary>
         /// <param name="sender">The source of the event</param>
-        /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
-        private void About_Click(object sender, RoutedEventArgs e)
+        /// <param name="e">The <see cref="ExecutedRoutedEventArgs"/> instance containing the event data.</param>
+        private void AboutCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             AboutWindow a = new AboutWindow();
             a.Show();
@@ -1186,7 +1170,7 @@ namespace LuAnimatorV2
                 MessageBoxResult mbr = MessageBox.Show("The project is unsaved. Do you want to save it first?", "Warning", MessageBoxButton.YesNoCancel);
                 if (mbr == MessageBoxResult.Yes)
                 {
-                    Save_Click(null, null);
+                    SaveCommand_Executed(null, null);
                 }
                 else if (mbr == MessageBoxResult.Cancel)
                     return false;
@@ -1340,5 +1324,78 @@ namespace LuAnimatorV2
             }
             isSaved = saved;
         }
+    }
+
+    public static class Commands
+    {
+        public static readonly RoutedUICommand New = new RoutedUICommand
+        (
+            "New Project...",
+            "New",
+            typeof(Commands),
+            new InputGestureCollection()
+            {
+                            new KeyGesture(Key.N, ModifierKeys.Control)
+            }
+
+        );
+
+        public static readonly RoutedUICommand Open = new RoutedUICommand
+        (
+            "Open Project...",
+            "Open",
+            typeof(Commands),
+            new InputGestureCollection()
+            {
+                            new KeyGesture(Key.O, ModifierKeys.Control)
+            }
+
+        );
+
+        public static readonly RoutedUICommand Save = new RoutedUICommand
+            (
+                "Save Project...",
+                "Save",
+                typeof(Commands),
+                new InputGestureCollection()
+                {
+                        new KeyGesture(Key.S, ModifierKeys.Control)
+                }
+            );
+
+        public static readonly RoutedUICommand SaveAs = new RoutedUICommand
+        (
+            "Save Project As...",
+            "SaveAs",
+            typeof(Commands),
+            new InputGestureCollection()
+            {
+                            new KeyGesture(Key.S, (ModifierKeys.Control | ModifierKeys.Shift))
+            }
+
+        );
+
+        public static readonly RoutedUICommand About = new RoutedUICommand
+        (
+            "About...",
+            "About",
+            typeof(Commands),
+            new InputGestureCollection()
+            {
+                            new KeyGesture(Key.F1)
+            }
+
+        );
+
+        public static readonly RoutedCommand DeleteFrame = new RoutedCommand
+        (
+            "Delete",
+            typeof(Commands),
+            new InputGestureCollection()
+            {
+                                    new KeyGesture(Key.Delete)
+            }
+
+        );
     }
 }
