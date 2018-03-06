@@ -363,7 +363,9 @@ namespace LuAnimatorV2
         private void Preview_MouseUp(object sender, MouseButtonEventArgs e)
         {
             imgPreview.ReleaseMouseCapture();
-            SetTitleAsSaved(false);
+
+            if (currentImage.Source != null)
+                SetTitleAsSaved(false);
         }
 
 
@@ -1218,6 +1220,13 @@ namespace LuAnimatorV2
             }
         }
 
+        private void OpenLocation(object sender, RoutedEventArgs e)
+        {
+            string localPath = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location);
+
+            System.Diagnostics.Process.Start(@localPath);
+        }
+
 
         /// <summary>
         /// Ask user to save his project before exiting the application
@@ -1247,6 +1256,7 @@ namespace LuAnimatorV2
                 {
                     try
                     {
+                        ad.DownloadFileGroup("modfiles");
                         System.Diagnostics.Process.Start(@ad.DataDirectory);
                     }
                     catch (System.ComponentModel.Win32Exception win32Exception)
