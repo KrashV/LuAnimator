@@ -4,7 +4,7 @@ using System.Reflection;
 namespace LuAnimatorV2
 {
     /// <summary>
-    /// Логика взаимодействия для About.xaml
+    /// Interaction logic for AboutWindow
     /// </summary>
     public partial class AboutWindow : Window
     {
@@ -40,7 +40,7 @@ namespace LuAnimatorV2
             lblVersion.Text = System.String.Format("Version {0}", version.ToString());
             lblCopyright.Text = copyright.Copyright.ToString();
             lblCompany.Text = company.Company;
-            lblDisclaimer.Text = "All right reserved.";
+            lblDisclaimer.Text = "All rights reserved.";
         }
     }
 }
