@@ -31,10 +31,11 @@
     <SupportUrl>https://plus.google.com/109386152747714156735</SupportUrl>
     <ProductName>LuAnimator</ProductName>
     <PublisherName>Degranon</PublisherName>
+    <SuiteName>Luanimator</SuiteName>
     <WebPage>publish.htm</WebPage>
     <OpenBrowserOnPublish>false</OpenBrowserOnPublish>
     <TrustUrlParameters>true</TrustUrlParameters>
-    <ApplicationRevision>3</ApplicationRevision>
+    <ApplicationRevision>4</ApplicationRevision>
     <ApplicationVersion>4.0.3.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <CreateDesktopShortcut>true</CreateDesktopShortcut>
