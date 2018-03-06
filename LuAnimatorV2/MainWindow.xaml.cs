@@ -1316,12 +1316,12 @@ namespace LuAnimatorV2
                         }
                     }
                 }
-            }
-            else
-            {
-                if (isRequested)
+                else
                 {
-                    MessageBox.Show("No update available for now", "No update available");
+                    if (isRequested)
+                    {
+                        MessageBox.Show("No update available for now", "No update available");
+                    }
                 }
             }
         }
