@@ -63,7 +63,7 @@
                     </MenuItem>
                 </MenuItem>
                 <MenuItem Header="Help">
-                    <MenuItem Header="Open location folder" Click="OpenLocation">
+                    <MenuItem Header="Open location folder" Click="OpenFileLocation">
                         <MenuItem.Icon>
                             <ContentControl Content="{StaticResource LocalPathIcon}" Margin="0" />
                         </MenuItem.Icon>

@@ -1220,7 +1220,7 @@ namespace LuAnimatorV2
             }
         }
 
-        private void OpenLocation(object sender, RoutedEventArgs e)
+        private void OpenFileLocation(object sender, RoutedEventArgs e)
         {
             string localPath = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location);
 
@@ -1251,20 +1251,6 @@ namespace LuAnimatorV2
             if (ApplicationDeployment.IsNetworkDeployed)
             {
                 ApplicationDeployment ad = ApplicationDeployment.CurrentDeployment;
-
-                if (ad.IsFirstRun)
-                {
-                    try
-                    {
-                        ad.DownloadFileGroup("modfiles");
-                        System.Diagnostics.Process.Start(@ad.DataDirectory);
-                    }
-                    catch (System.ComponentModel.Win32Exception win32Exception)
-                    {
-                        //The system cannot find the file specified...
-                        Console.WriteLine(win32Exception.Message);
-                    }
-                }
 
                 try
                 {
