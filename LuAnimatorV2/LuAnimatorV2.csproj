@@ -35,7 +35,7 @@
     <WebPage>publish.htm</WebPage>
     <OpenBrowserOnPublish>false</OpenBrowserOnPublish>
     <TrustUrlParameters>true</TrustUrlParameters>
-    <ApplicationRevision>5</ApplicationRevision>
+    <ApplicationRevision>6</ApplicationRevision>
     <ApplicationVersion>4.0.3.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <CreateDesktopShortcut>true</CreateDesktopShortcut>
@@ -159,28 +159,14 @@
     <Page Include="About.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="BorderBackground.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="CropWindow.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="BitmapConverter.cs" />
-    <Compile Include="BorderBackground.xaml.cs">
-      <DependentUpon>BorderBackground.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Directive.cs" />
     <Compile Include="DrawablesUtilities.cs" />
     <Compile Include="FileGenerator.cs" />
-    <Compile Include="CropWindow.xaml.cs">
-      <DependentUpon>CropWindow.xaml</DependentUpon>
-    </Compile>
     <Compile Include="ImageCropper.cs" />
     <Page Include="Icons.xaml">
       <Generator>MSBuild:Compile</Generator>
