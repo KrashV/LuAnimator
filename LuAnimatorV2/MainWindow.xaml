@@ -5,11 +5,13 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:dd="urn:gong-wpf-dragdrop"
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+        xmlns:local="clr-namespace:LuAnimatorV2"
         mc:Ignorable="d"
         Title="LuAnimator v4. Plz Donate."
         Height="560" Width="854" Style="{DynamicResource CustomWindow}" ResizeMode="CanMinimize"
         Closing="Window_Closing">
     <Window.Resources>
+        
         <ControlTemplate x:Key="template1">
             <StackPanel>
                 <Rectangle Name="tplImage" Fill="Black" Stretch="Uniform" Width="32" Height="32"/>
@@ -33,9 +35,15 @@
                             <ContentControl Content="{StaticResource OpenIcon}" Margin="0" />
                         </MenuItem.Icon>
                     </MenuItem>
+                    <Separator />
                     <MenuItem Header="Save Project..." Click="Save_Click">
                         <MenuItem.Icon>
                             <ContentControl Content="{StaticResource SaveIcon}" Margin="0" />
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <MenuItem Header="Save Project As..." Click="Save_As_Click">
+                        <MenuItem.Icon>
+                            <ContentControl Content="{StaticResource SaveAsIcon}" Margin="0" />
                         </MenuItem.Icon>
                     </MenuItem>
                     <Separator />
@@ -144,9 +152,9 @@
                         <Label Content="Frame Scale:" Width="150"
                             ToolTip="Change the frame scale" HorizontalAlignment="Left" />
                         <xctk:DoubleUpDown x:Name="tbxframeSize" Increment="0.05" Minimum="0.1" AllowSpin="True" Text="1" HorizontalAlignment="Left"
-                                           VerticalAlignment="Top" IsReadOnly="False" Width="60" Height="25"/>
+                                           VerticalAlignment="Top" IsReadOnly="False" Width="60" Height="25" ValueChanged="Scale_ValueChanged"/>
                         <Label Content="Loop:" ToolTip="Check whether the animation should play in the loop"  />
-                        <CheckBox x:Name="chkLoop" IsChecked="True" ToolTip="Check whether the animation should play in the loop" Margin="5" Width="22" />
+                        <CheckBox x:Name="chkLoop" IsChecked="True" ToolTip="Check whether the animation should play in the loop" Margin="5" Width="22" Click="Loop_Click"/>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal">
                         <Label Content="Animation Speed:"
@@ -216,22 +224,35 @@
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0, 30">
                         <StackPanel Orientation="Vertical">
                             <Label ToolTip="Check whether the sound should play in the loop" Content="Sound&#xD;&#xA;Loop:"/>
-                            <CheckBox Name="chkSoundLoop" ToolTip="Check whether the sound should play in the loop" Margin="20, 0"/>
+                            <CheckBox Name="chkSoundLoop" ToolTip="Check whether the sound should play in the loop" Margin="20, 0"
+                                      Click="SoundLoop_Clicked"/>
                         </StackPanel>
 
                         <StackPanel Orientation="Vertical">
                             <Label ToolTip="Set the sound interval (in seconds)" Content="Sound&#xD;&#xA;Interval:"/>
-                            <xctk:DoubleUpDown x:Name="tbxSoundInterval" Minimum="0.2" Increment="0.1" TextAlignment="Center" Margin="10, 0" AllowSpin="True" Text="1" HorizontalAlignment="Left" VerticalAlignment="Top" IsReadOnly="False" Width="58" Height="28" ToolTip="Set the sound interval (in seconds)"/>
+                            <xctk:DoubleUpDown x:Name="tbxSoundInterval" Minimum="0.2" Increment="0.1" TextAlignment="Center" 
+                                               Margin="10, 0" AllowSpin="True" Text="1" 
+                                               HorizontalAlignment="Left" VerticalAlignment="Top" IsReadOnly="False" 
+                                               Width="58" Height="28" ToolTip="Set the sound interval (in seconds)"
+                                               ValueChanged="SoundInterval_Changed"/>
                         </StackPanel>
 
                         <StackPanel Orientation="Vertical">
                             <Label Content="Sound&#xD;&#xA;Volume:" ToolTip="Sets the volume of the sound"/>
-                            <xctk:DoubleUpDown x:Name="tbxSoundVolume" Minimum="0" Increment="0.1" TextAlignment="Center" Maximum="5" ToolTip="Sets the volume of the sound" Margin="10, 0" AllowSpin="True" Text="1" HorizontalAlignment="Left" VerticalAlignment="Top" IsReadOnly="False" Width="58" Height="28"/>
+                            <xctk:DoubleUpDown x:Name="tbxSoundVolume" Minimum="0" Increment="0.1" TextAlignment="Center" 
+                                               Maximum="5" ToolTip="Sets the volume of the sound" Margin="10, 0" 
+                                               AllowSpin="True" Text="1" HorizontalAlignment="Left" VerticalAlignment="Top" 
+                                               IsReadOnly="False" Width="58" Height="28"
+                                               ValueChanged="SoundVolume_Changed"/>
                         </StackPanel>
 
                         <StackPanel Orientation="Vertical">
                             <Label Content="Sound&#xD;&#xA;Pitch:" ToolTip="Sets the pitch of the sound"/>
-                            <xctk:DoubleUpDown x:Name="tbxSoundPitch" Minimum="0" Increment="0.1"  TextAlignment="Center" ToolTip="Sets the pitch of the sound" Maximum="5" Margin="10, 0" AllowSpin="True" Text="1" HorizontalAlignment="Left" VerticalAlignment="Top" IsReadOnly="False" Width="61" Height="28"/>
+                            <xctk:DoubleUpDown x:Name="tbxSoundPitch" Minimum="0" Increment="0.1"  TextAlignment="Center" 
+                                               ToolTip="Sets the pitch of the sound" Maximum="5" Margin="10, 0" 
+                                               AllowSpin="True" Text="1" HorizontalAlignment="Left" VerticalAlignment="Top" 
+                                               IsReadOnly="False" Width="61" Height="28"
+                                               ValueChanged="SoundPitch_Changed"/>
                         </StackPanel>
                     </StackPanel>
                 </StackPanel>
@@ -257,7 +278,8 @@
                                    dd:DragDrop.UseDefaultDragAdorner="True"
                                    dd:DragDrop.IsDragSource="True"
                                    dd:DragDrop.IsDropTarget="True"
-                                    DragEnter="ListBox_DragEnter" DragLeave="ListBox_DragLeave" MouseLeave="ListBox_MouseLeave" SelectionMode="Single">
+                                   DragEnter="ListBox_DragEnter" DragLeave="ListBox_DragLeave" MouseLeave="ListBox_MouseLeave" SelectionMode="Single"
+                                   >
                                     <ListBox.ItemsPanel>
                                         <ItemsPanelTemplate>
                                             <StackPanel Orientation="Horizontal" Margin="1" />

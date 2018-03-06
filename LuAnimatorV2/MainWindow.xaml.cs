@@ -11,7 +11,6 @@ using System.IO;
 using System.Threading;
 using System.Windows.Controls;
 using System.Deployment.Application;
-using DrawablesGeneratorTool;
 
 using FormCollection = System.Collections.ObjectModel.ObservableCollection<LuAnimatorV2.modeNode>;
 using AnimationCollection = System.Collections.ObjectModel.ObservableCollection<System.Collections.ObjectModel.ObservableCollection<LuAnimatorV2.modeNode>>;
@@ -35,32 +34,26 @@ namespace LuAnimatorV2
 
         private System.Windows.Controls.Image currentImage;
 
-        private static string previousMode = "Idle",
-                              previousEmote = "idle";
+        private static string previousModeName = "Idle",
+                              previousEmoteName = "idle";
 
-        private static readonly int
-            PREVIEW_MARGIN_LEFT = 202,
-            PREVIEW_MARGIN_TOP = 300,
-            PREVIEW_MARGIN_RIGHT = 192,
-            PREVIEW_MARGIN_BOTTOM = 73;
+        private static readonly Thickness DEFAULT_MARGIN = new Thickness(202, 300, 192, 73);
 
         private static DispatcherTimer _timer;
 
         private static bool isSaved = true;
-
+        private static string fileName = "New animation";
+        
         public MainWindow()
         {
             InitializeComponent();
-
+            
             this.WindowStartupLocation = System.Windows.WindowStartupLocation.CenterScreen;
 
             InstallUpdateSyncWithInfo(false);
 
             InitializeImage(imgPreview);
             InitializeImage(imgPreviewF);
-
-
-            currentFrame = 0;
             currentImage = imgPreview;
 
             ListBoxFrames.Focus();
@@ -69,17 +62,16 @@ namespace LuAnimatorV2
             _timer.Interval = span;
             _timer.Tick += new EventHandler(AnimatingCycle);
             _timer.Start();
+
+            ((System.Collections.Specialized.INotifyCollectionChanged)ListBoxFrames.Items).CollectionChanged += (sender, e) =>
+            {
+                SetTitleAsSaved(false);
+            };
         }
 
         private void InitializeImage(System.Windows.Controls.Image img)
         {
-            Thickness t = img.Margin;
-            t.Bottom = PREVIEW_MARGIN_BOTTOM;
-            t.Left = PREVIEW_MARGIN_LEFT;
-            t.Top = PREVIEW_MARGIN_TOP;
-            t.Right = PREVIEW_MARGIN_RIGHT;
-
-            img.Margin = t;
+            img.Margin = DEFAULT_MARGIN;
             img.Height = img.Width = 0;
         }
 
@@ -108,12 +100,12 @@ namespace LuAnimatorV2
             System.Windows.Controls.Image backImage = currentImage == imgPreview ? imgPreviewF : imgPreview;
 
             if (animationCollection.Count != 0)
-            { 
-                modeNode mode = animationCollection[currentForm].FirstOrDefault(form => form.modeName == previousMode);
+            {
+                modeNode mode = animationCollection[currentForm].FirstOrDefault(form => form.modeName == previousModeName);
 
                 if (mode != null)
                 {
-                    emoteNode emote = mode.emotes.FirstOrDefault(em => em.name == previousEmote);
+                    emoteNode emote = mode.emotes.FirstOrDefault(em => em.name == previousEmoteName);
 
                     if (emote != null)
                     {
@@ -189,7 +181,6 @@ namespace LuAnimatorV2
         /// <param name="files">Files to check and put on success</param>
         private void PopulateListBox(string[] files)
         {
-            ListBoxFrames.Items.Clear();
             foreach (string path in files)
             {
                 if (IsValidImage(path))
@@ -201,7 +192,8 @@ namespace LuAnimatorV2
                 {
                     PopulateListBox(ExtractGif(path));
                 }
-                else {
+                else
+                {
                     MessageBox.Show("Please choose valid images!");
                     return;
                 }
@@ -249,11 +241,11 @@ namespace LuAnimatorV2
         /// <param name="frames">Frames to put in the ListBox</param>
         private void PopulateListBox(BitmapSource[] frames)
         {
-            ListBoxFrames.Items.Clear();
             foreach (BitmapSource p in frames)
             {
                 ListBoxFrames.Items.Add(p);
             }
+
         }
 
         #region Themes
@@ -309,8 +301,8 @@ namespace LuAnimatorV2
 
         private void SetImage(object sender, System.Windows.Point pos)
         {
-            xtranslation = (int)pos.X - PREVIEW_MARGIN_LEFT;
-            ytranslation = PREVIEW_MARGIN_TOP - (int)pos.Y;
+            xtranslation = (int)pos.X - (int)DEFAULT_MARGIN.Left;
+            ytranslation = (int)DEFAULT_MARGIN.Top - (int)pos.Y;
 
             tbxXPos.Text = xtranslation.ToString();
             tbxYPos.Text = ytranslation.ToString();
@@ -348,12 +340,12 @@ namespace LuAnimatorV2
 
         private void ModifyPosition(System.Windows.Controls.Image img)
         {
-            Thickness t = img.Margin;
-            t.Left = PREVIEW_MARGIN_LEFT - img.Width + xtranslation;
-            t.Top = PREVIEW_MARGIN_TOP - img.Height - ytranslation;
-            t.Right = PREVIEW_MARGIN_RIGHT - img.Width - xtranslation;
-            t.Bottom = PREVIEW_MARGIN_BOTTOM - img.Height + ytranslation;
-            img.Margin = t;
+            img.Margin = new Thickness(
+                (int)DEFAULT_MARGIN.Left - img.Width + xtranslation,
+                (int)DEFAULT_MARGIN.Top - img.Height - ytranslation,
+                (int)DEFAULT_MARGIN.Right - img.Width - xtranslation,
+                (int)DEFAULT_MARGIN.Bottom - img.Height + ytranslation
+                );
         }
 
         /// <summary>
@@ -364,6 +356,7 @@ namespace LuAnimatorV2
         private void Preview_MouseUp(object sender, MouseButtonEventArgs e)
         {
             imgPreview.ReleaseMouseCapture();
+            SetTitleAsSaved(false);
         }
 
 
@@ -407,6 +400,7 @@ namespace LuAnimatorV2
             emote.soundVolume = tbxSoundVolume != null ? (double)tbxSoundVolume.Value : 1;
             emote.soundPitch = tbxSoundPitch != null ? (double)tbxSoundPitch.Value : 1;
 
+
             if (ListBoxFrames != null && !ListBoxFrames.Items.IsEmpty)
             {
                 if (currentImage == imgPreview)
@@ -419,7 +413,6 @@ namespace LuAnimatorV2
                     emote.fullbrightFrames = new BitmapSource[ListBoxFrames.Items.Count];
                     ListBoxFrames.Items.CopyTo(emote.fullbrightFrames, 0);
                 }
-                isSaved = false;
             }
         }
 
@@ -428,23 +421,26 @@ namespace LuAnimatorV2
             if (animationCollection.ElementAtOrDefault(currentForm) == null)
             {
                 FormCollection f = new FormCollection();
+                f.CollectionChanged += new System.Collections.Specialized.NotifyCollectionChangedEventHandler((obj, target) => {
+                    SetTitleAsSaved(false);
+                });
                 animationCollection.Add(f);
             }
             if (ListBoxFrames != null && !ListBoxFrames.Items.IsEmpty)
             {
-                modeNode mode = animationCollection[currentForm].FirstOrDefault(form => form.modeName == previousMode);
+                modeNode mode = animationCollection[currentForm].FirstOrDefault(form => form.modeName == previousModeName);
                 if (mode == null)
                 {
                     mode = new modeNode();
-                    mode.modeName = previousMode;
+                    mode.modeName = previousModeName;
                     mode.emotes = new System.Collections.Generic.List<emoteNode>();
                     animationCollection[currentForm].Add(mode);
                 }
-                emoteNode emote = mode.emotes.FirstOrDefault(em => em.name == previousEmote);
+                emoteNode emote = mode.emotes.FirstOrDefault(em => em.name == previousEmoteName);
                 if (emote == null)
                 {
                     emote = new emoteNode();
-                    emote.name = previousEmote;
+                    emote.name = previousEmoteName;
 
                     mode.emotes.Add(emote);
                 }
@@ -456,7 +452,10 @@ namespace LuAnimatorV2
         private void Advanced_Load()
         {
             if (animationCollection.ElementAtOrDefault(currentForm) == null)
+            {
                 animationCollection.Add(new FormCollection());
+                soundName.Text = "";
+            }
 
             ComboBoxItem CBIM = (ComboBoxItem)cbxGenerateType.SelectedValue;
             string state = CBIM.Content.ToString();
@@ -489,8 +488,9 @@ namespace LuAnimatorV2
                     tbxSoundInterval.Value = emote.soundInterval;
                     tbxSoundPitch.Value = emote.soundPitch;
                     tbxSoundVolume.Value = emote.soundVolume;
-                    soundName.Text = String.Join(" ", emote.sound);
+                    soundName.Text = emote.sound != null ? String.Join(" ", emote.sound) : "";
 
+                    ListBoxFrames.Items.Clear();
                     if (currentImage == imgPreview)
                     {
                         if (emote.frames != null)
@@ -525,6 +525,7 @@ namespace LuAnimatorV2
             if (openFileDialog.ShowDialog() == true)
             {
                 soundName.Text = ConvertPath(openFileDialog.FileNames);
+                SetTitleAsSaved(false);
             }
         }
 
@@ -554,6 +555,7 @@ namespace LuAnimatorV2
                     }
                 }
                 soundName.Text = null;
+                SetTitleAsSaved(false);
             }
         }
 
@@ -626,6 +628,7 @@ namespace LuAnimatorV2
         {
             if (ListBoxFrames.SelectedItem != null)
                 ListBoxFrames.Items.Remove(ListBoxFrames.SelectedItem);
+
         }
 
         /// <summary>
@@ -645,7 +648,11 @@ namespace LuAnimatorV2
         /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
         private void CheckBox_Invisible_Checked(object sender, EventArgs e)
         {
-            imgPreviewCharacter.Opacity = 0.5;
+            if (chkInvisible.IsLoaded)
+            {
+                imgPreviewCharacter.Opacity = 0.5;
+                SetTitleAsSaved(false);
+            }
         }
 
         /// <summary>
@@ -655,7 +662,11 @@ namespace LuAnimatorV2
         /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
         private void CheckBox_Invisible_Unchecked(object sender, EventArgs e)
         {
-            imgPreviewCharacter.Opacity = 1;
+            if (chkInvisible.IsLoaded)
+            {
+                imgPreviewCharacter.Opacity = 1;
+                SetTitleAsSaved(false);
+            }
         }
 
         /// <summary>
@@ -704,7 +715,6 @@ namespace LuAnimatorV2
                         emote.fullbrightFrames = null;
                 }
             }
-
         }
 
         /// <summary>
@@ -741,18 +751,20 @@ namespace LuAnimatorV2
             TimeSpan span = TimeSpan.FromMilliseconds(animationSpeed * 1000.0 / 60.0);
             _timer.Interval = span;
 
+            SetTitleAsSaved(false);
         }
 
         /// <summary>
         /// Change the current mode and emoting according to user's request
         /// </summary>
         /// <param name="sender">The source of the event</param>
-        /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
-        private void ComboBox_Selection_Changed(object sender, EventArgs e)
+        /// <param name="e">The <see cref="SelectionChangedEventArgs"/> instance containing the event data.</param>
+        private void ComboBox_Selection_Changed(object sender, SelectionChangedEventArgs e)
         {
             if (ListBoxFrames == null || chkLoop == null || chkInvisible == null || cbxGenerateEmote == null || cbxGenerateType == null || cbxGenerateType.SelectedIndex == -1 || cbxGenerateEmote.SelectedIndex == -1)
                 return;
 
+            bool wasSaved = isSaved;
             // Saving mode
             Advanced_Save();
 
@@ -792,11 +804,13 @@ namespace LuAnimatorV2
                     break;
             }
 
-            previousMode = state;
-            previousEmote = emotestate;
+            previousModeName = state;
+            previousEmoteName = emotestate;
 
             ModifyPosition();
+            SetTitleAsSaved(wasSaved);
         }
+
 
         /// <summary>
         /// Change the current layer according to user's request
@@ -826,19 +840,35 @@ namespace LuAnimatorV2
         }
 
         /// <summary>
+        /// Frame scale value changed
+        /// </summary>
+        /// <param name="sender">The source of the event</param>
+        /// <param name="e">The <see cref="System.ComponentModel.CancelEventArgs"/> instance containing the event data.</param>
+        private void Scale_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+        {
+            if (tbxframeSize.IsLoaded && tbxframeSize.Value.HasValue)
+            {
+                SetTitleAsSaved(false);
+            }
+        }
+
+        /// <summary>
         /// Keyboard event handler: move the image around or execute standart shortcuts
         /// </summary>
         /// <param name="sender">The source of the event</param>
         /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
         private void Grid_PreviewKeyDown(object sender, KeyEventArgs e)
         {
-            
+
             switch (e.Key)
             {
                 case Key.S:
                     if (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl))
                     {
-                        Save_Click(sender, null);
+                        if (!Keyboard.IsKeyDown(Key.LeftShift) || !Keyboard.IsKeyDown(Key.RightShift))
+                            Save_Click(sender, null);
+                        else
+                            Save_As_Click(sender, null);
                     }
                     break;
                 case Key.O:
@@ -905,18 +935,19 @@ namespace LuAnimatorV2
         /// <param name="formNumber">The number of desired form</param>
         private void SetForm(int formNumber)
         {
+            bool wasSaved = isSaved;
             // Saving mode
             Advanced_Save();
 
             currentForm = formNumber;
-            
+
             tbxCurrentForm.Text = "Form " + (currentForm + 1);
 
             btnLeftForm.IsEnabled = (currentForm != 0);
 
+            previousModeName = "Idle";
+            previousEmoteName = "idle";
 
-            previousMode = "Idle";
-            previousEmote = "idle";
             ListBoxFrames.Items.Clear();
 
             cbxGenerateType.SelectedIndex = 0;
@@ -924,6 +955,7 @@ namespace LuAnimatorV2
 
             // Loading mode
             Advanced_Load();
+            SetTitleAsSaved(wasSaved);
         }
 
         #endregion
@@ -941,12 +973,14 @@ namespace LuAnimatorV2
             if (AskUserToSave())
             {
                 CleanUP();
-                previousEmote = "idle";
-                previousMode = "Idle";
+                previousEmoteName = "idle";
+                previousModeName = "Idle";
                 currentForm = 0;
                 ListBoxFrames.Items.Clear();
                 SetForm(0);
-                isSaved = true;
+                fileName = "New animation";
+                this.Title = fileName + " - LuAnimator";
+                SetTitleAsSaved(true);
             }
         }
 
@@ -956,6 +990,25 @@ namespace LuAnimatorV2
         /// <param name="sender">The source of the event</param>
         /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
         private void Save_Click(object sender, RoutedEventArgs e)
+        {
+            if (File.Exists(fileName))
+            {
+                Advanced_Save();
+                Thread awaiting = OpenProgressBarWindow("Saving...");
+                File.WriteAllText(fileName, FileGenerator.ToJson(animationCollection));
+                awaiting.Abort();
+                SetTitleAsSaved(true);
+            }
+            else
+                Save_As_Click(sender, e);
+        }
+
+        /// <summary>
+        /// A handler for Save As File menu option
+        /// </summary>
+        /// <param name="sender">The source of the event</param>
+        /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
+        private void Save_As_Click(object sender, RoutedEventArgs e)
         {
             SaveFileDialog sfd = new SaveFileDialog();
             sfd.Title = "Save file to...";
@@ -971,9 +1024,14 @@ namespace LuAnimatorV2
                 File.WriteAllText(sfd.FileName, FileGenerator.ToJson(animationCollection));
 
                 awaiting.Abort();
-                isSaved = true;
-            }            
+
+                fileName = sfd.FileName;
+                SetTitleAsSaved(true);
+
+            }
         }
+
+
 
         /// <summary>
         /// A handler for Open File menu option
@@ -995,10 +1053,10 @@ namespace LuAnimatorV2
                 {
                     Thread awaiting = OpenProgressBarWindow("Loading " + Path.GetFileName(ofd.FileName) + "\nThis will take a while");
                     AnimationCollection temp = FileGenerator.ToAnimationCollection(ofd.FileName);
+                    awaiting.Abort();
 
                     if (temp == null)
                     {
-                        awaiting.Abort();
                         MessageBox.Show("Couldn't load the file");
                     }
                     else
@@ -1010,7 +1068,9 @@ namespace LuAnimatorV2
                         animationCollection = temp;
                         SetForm(0);
 
-                        awaiting.Abort();
+                        fileName = ofd.FileName;
+                        // we've just opened the project
+                        SetTitleAsSaved(true);
                     }
                 }
             }
@@ -1132,6 +1192,48 @@ namespace LuAnimatorV2
             return true;
         }
 
+
+        private void Loop_Click(object sender, RoutedEventArgs e)
+        {
+            if (chkLoop.IsLoaded && chkLoop.IsChecked.HasValue)
+            {
+                SetTitleAsSaved(false);
+            }
+        }
+
+        private void SoundLoop_Clicked(object sender, RoutedEventArgs e)
+        {
+            if (chkSoundLoop.IsLoaded && chkSoundLoop.IsChecked.HasValue)
+            {
+                SetTitleAsSaved(false);
+            }
+        }
+
+        private void SoundInterval_Changed(object sender, RoutedPropertyChangedEventArgs<object> e)
+        {
+            if (tbxSoundInterval.IsLoaded && tbxSoundInterval.Value.HasValue)
+            {
+                SetTitleAsSaved(false);
+            }
+        }
+
+        private void SoundVolume_Changed(object sender, RoutedPropertyChangedEventArgs<object> e)
+        {
+            if (tbxSoundVolume.IsLoaded && tbxSoundVolume.Value.HasValue)
+            {
+                SetTitleAsSaved(false);
+            }
+        }
+
+        private void SoundPitch_Changed(object sender, RoutedPropertyChangedEventArgs<object> e)
+        {
+            if (tbxSoundPitch.IsLoaded && tbxSoundPitch.Value.HasValue)
+            {
+                SetTitleAsSaved(false);
+            }
+        }
+
+
         /// <summary>
         /// Ask user to save his project before exiting the application
         /// </summary>
@@ -1222,6 +1324,19 @@ namespace LuAnimatorV2
                     MessageBox.Show("No update available for now", "No update available");
                 }
             }
+        }
+
+        private void SetTitleAsSaved(bool saved)
+        {
+            if (!saved)
+            {
+                this.Title = this.Title = "*" + fileName + " - LuAnimator";
+            }
+            else
+            {
+                this.Title = this.Title = fileName + " - LuAnimator";
+            }
+            isSaved = saved;
         }
     }
 }
