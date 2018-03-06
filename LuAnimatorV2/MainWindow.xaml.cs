@@ -1243,6 +1243,19 @@ namespace LuAnimatorV2
             {
                 ApplicationDeployment ad = ApplicationDeployment.CurrentDeployment;
 
+                if (ad.IsFirstRun)
+                {
+                    try
+                    {
+                        System.Diagnostics.Process.Start(@ad.DataDirectory);
+                    }
+                    catch (System.ComponentModel.Win32Exception win32Exception)
+                    {
+                        //The system cannot find the file specified...
+                        Console.WriteLine(win32Exception.Message);
+                    }
+                }
+
                 try
                 {
                     info = ad.CheckForDetailedUpdate();
