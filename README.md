@@ -24,7 +24,7 @@ Download the [latest release](https://github.com/KrashV/LuAnimator/releases/tag/
 
 ## Usage
 
-See [Usage]() for additional information.
+See [Usage](https://github.com/KrashV/LuAnimator/wiki) for additional information.
 
 ## Contributing
 
