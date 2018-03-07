@@ -23,9 +23,9 @@ namespace LuAnimatorV2
     /// </summary>
 
 
-
     public partial class MainWindow : Window
     {
+        private readonly string changelog = "Added changelog support.\nFixed the image scaling in the list.";
         AnimationCollection animationCollection = new AnimationCollection();
 
         private static int currentForm = 0,
@@ -1251,6 +1251,11 @@ namespace LuAnimatorV2
             if (ApplicationDeployment.IsNetworkDeployed)
             {
                 ApplicationDeployment ad = ApplicationDeployment.CurrentDeployment;
+
+                if (ad.IsFirstRun)
+                {
+                    MessageBox.Show("Changelog:\n" + ad.CurrentVersion.ToString() + ": " + changelog);
+                }
 
                 try
                 {

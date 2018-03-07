@@ -306,7 +306,8 @@
                                         <DataTemplate>
                                             <StackPanel Orientation="Horizontal" Focusable="False">
                                                 <Border Width="80" Height="80" BorderThickness="2" BorderBrush="DarkGray" Focusable="False">
-                                                    <Image Source="{Binding}" Width="70" Height="70" Focusable="False"/>
+                                                    <Image Source="{Binding}" Width="70" Height="70" Focusable="False"
+                                                           RenderOptions.BitmapScalingMode="NearestNeighbor"/>
                                                 </Border>
                                             </StackPanel>
                                         </DataTemplate>
