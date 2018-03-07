@@ -2,7 +2,7 @@
 
 Starbound tool for custom animations.
 <p align="center">
-  <img src="logo.png">
+  <img src="https://i.imgur.com/ub9S260.png">
 
 </p>
 
