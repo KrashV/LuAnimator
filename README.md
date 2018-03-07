@@ -1,6 +1,10 @@
 # LuAnimator
 
 Starbound tool for custom animations.
+<p align="center">
+  <img src="logo.png">
+
+</p>
 
 ### Synopsis
 
