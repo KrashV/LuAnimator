@@ -1081,7 +1081,7 @@ namespace LuAnimatorV2
         /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
         private void Guide_Click(object sender, RoutedEventArgs e)
         {
-            System.Diagnostics.Process.Start("http://ilovebacons.com/showcase/luanimator-v3-1-01.228/");
+            System.Diagnostics.Process.Start("https://github.com/KrashV/LuAnimator/wiki");
         }
 
         /// <summary>
