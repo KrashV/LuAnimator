@@ -37,7 +37,7 @@ Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduc
 * **Degranon** - *Current developer* - [Degranon](https://github.com/JohnDoe)
 * **C0bra5** - *Provided directives processing* - [C0bra5](https://github.com/C0bra5)
 
-See also the list of [contributors](https://github.com/your/project/contributors) who participated in this project.
+See also the list of [contributors](https://github.com/KrashV/LuAnimator/contributors) who participated in this project.
 
 ## License
 
