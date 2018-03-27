@@ -1221,13 +1221,6 @@ namespace LuAnimatorV2
             }
         }
 
-        private void OpenFileLocation(object sender, RoutedEventArgs e)
-        {
-            string localPath = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location);
-
-            System.Diagnostics.Process.Start(@localPath);
-        }
-
 
         /// <summary>
         /// Ask user to save his project before exiting the application

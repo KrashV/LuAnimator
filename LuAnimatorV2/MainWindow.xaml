@@ -63,11 +63,6 @@
                     </MenuItem>
                 </MenuItem>
                 <MenuItem Header="Help">
-                    <MenuItem Header="Open location folder" Click="OpenFileLocation">
-                        <MenuItem.Icon>
-                            <ContentControl Content="{StaticResource LocalPathIcon}" Margin="0" />
-                        </MenuItem.Icon>
-                    </MenuItem>
                     <MenuItem Header="Check for updates" Click="Update_Click">
                         <MenuItem.Icon>
                             <ContentControl Content="{StaticResource UpdateIcon}" Margin="0" />
