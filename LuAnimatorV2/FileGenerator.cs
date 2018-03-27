@@ -139,11 +139,10 @@ namespace LuAnimatorV2
         {
             AnimationCollection animation = new AnimationCollection();
 
-            JToken settings = JToken.Parse(File.ReadAllText(path));
-            int currentForm = -1;
-
             try
             {
+                JToken settings = JToken.Parse(File.ReadAllText(path));
+                int currentForm = -1;
                 foreach (JToken jForm in settings)
                 {
                     currentForm++;
@@ -234,8 +233,9 @@ namespace LuAnimatorV2
                     }
                 }
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                System.Windows.MessageBox.Show(e.StackTrace, "Error!");
                 return null;
             }
             return animation;

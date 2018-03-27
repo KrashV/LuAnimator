@@ -1033,6 +1033,7 @@ namespace LuAnimatorV2
 
                 OpenFileDialog ofd = new OpenFileDialog();
 
+
                 ofd.Filter = "JSON Files |*.json";
                 ofd.Title = "Open luanimation.json";
 
