@@ -20,7 +20,7 @@ For running the application .Net 4 is required; the installer should provide you
 
 ### Installing
 
-Download the [latest release](https://github.com/KrashV/LuAnimator/releases/tag/v4.0.0.6), extract the folder and run setup.exe
+See [Installing](https://github.com/KrashV/LuAnimator/wiki/1.-Installing) for additional information.
 
 ## Usage
 
