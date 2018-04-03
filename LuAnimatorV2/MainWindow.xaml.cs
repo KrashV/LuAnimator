@@ -25,7 +25,7 @@ namespace LuAnimatorV2
 
     public partial class MainWindow : Window
     {
-        private readonly string changelog = "Added changelog support.\nFixed the image scaling in the list.";
+        private readonly string changelog = "Finally fixed the loading issue";
         AnimationCollection animationCollection = new AnimationCollection();
 
         private static int currentForm = 0,

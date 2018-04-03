@@ -18,6 +18,7 @@ using System.Threading.Tasks;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Drawing.Drawing2D;
+using System.Reflection;
 
 namespace StarCheatReloaded.GUI
 {
@@ -25,8 +26,9 @@ namespace StarCheatReloaded.GUI
     {
         public string Type { get; set; } = null;
         public string[] Parameters { get; set; } = null;
+        
 
-        static string CompiledAssets = "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Starbound\\assets\\packed\\";
+
         public Directive()
         {
         }
@@ -467,8 +469,10 @@ namespace StarCheatReloaded.GUI
                 return;
             }
 
-            Bitmap toApply = new Bitmap(CompiledAssets + d.Parameters[0]);
-
+            //here we will consider using signPlaceHolder image only
+            Bitmap bmp = LuAnimatorV2.Properties.Resources.signplaceholder;
+            Bitmap toApply = bmp.Clone(new Rectangle(0, 0, bmp.Width, bmp.Height),
+            PixelFormat.Format32bppArgb);
             int trg_w = toApply.Width;
             int trg_h = toApply.Height;
 
@@ -613,7 +617,8 @@ namespace StarCheatReloaded.GUI
                 return;
             }
 
-            Bitmap toApply = new Bitmap(CompiledAssets + d.Parameters[0]);
+            //here we will consider using signPlaceHolder image only
+            Bitmap toApply = new Bitmap(LuAnimatorV2.Properties.Resources.signplaceholder);
             int xOffset = 8;
             int yOffset = 8;
 
@@ -878,7 +883,8 @@ namespace StarCheatReloaded.GUI
         private static void applyAddMaskDirective(ref Bitmap b, Directive d)
         {
 
-            Bitmap mask = new Bitmap(CompiledAssets + d.Parameters[0]);
+            //here we will consider using signPlaceHolder image only
+            Bitmap mask = new Bitmap(LuAnimatorV2.Properties.Resources.signplaceholder);
             int w = b.Width;
             int h = b.Height;
             BitmapData src_unlocked = b.LockBits(new Rectangle(0, 0, w, h), ImageLockMode.ReadWrite, PixelFormat.Format32bppArgb);
@@ -921,7 +927,8 @@ namespace StarCheatReloaded.GUI
         private static void applySubMaskDirective(ref Bitmap b, Directive d)
         {
 
-            Bitmap mask = new Bitmap(CompiledAssets + d.Parameters[0]);
+            //here we will consider using signPlaceHolder image only
+            Bitmap mask = new Bitmap(LuAnimatorV2.Properties.Resources.signplaceholder);
             int w = b.Width;
             int h = b.Height;
             BitmapData src_unlocked = b.LockBits(new Rectangle(0, 0, w, h), ImageLockMode.ReadWrite, PixelFormat.Format32bppArgb);

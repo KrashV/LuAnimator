@@ -244,11 +244,22 @@ namespace LuAnimatorV2
         private static Task<BitmapSource> GetBitmapSource(string directive)
         {
             return Task.Run(() => {
-                Bitmap bmp = new Bitmap(64, 64);
-                StarCheatReloaded.GUI.Directive.ApplyDirectives(ref bmp, directive);
 
-                BitmapSource frame = BitmapConverter.BitmapToBitmapSource(bmp);
-                bmp.Dispose();
+                Bitmap bmp = new Bitmap(64, 64);
+                BitmapSource frame;
+                try
+                {
+                    StarCheatReloaded.GUI.Directive.ApplyDirectives(ref bmp, directive);
+                    frame = BitmapConverter.BitmapToBitmapSource(bmp);
+                }
+                catch (Exception e)
+                {
+                    throw new Exception(e.Message);
+                }
+                finally
+                {
+                    bmp.Dispose();
+                }
                 return frame;
             });
         }
