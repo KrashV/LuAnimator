@@ -1,9 +1,0 @@
-{
-  "name" : "Degranon's LuAnimator v4",
-  "path" : ".",
-  "requires" : [],
-  "includes" : [],
-  "version" : "Cheerful Giraffe - SB 1.3.3",
-  "author" : "Degranon & Silverfeelin",
-  "description": "Another implementation of famous LuAnimator"
-}

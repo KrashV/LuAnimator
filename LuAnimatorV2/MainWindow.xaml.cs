@@ -25,7 +25,7 @@ namespace LuAnimatorV2
 
     public partial class MainWindow : Window
     {
-        private readonly string changelog = "Finally fixed the loading issue";
+        private readonly string changelog = "Added an optimisation of repeated frames";
         AnimationCollection animationCollection = new AnimationCollection();
 
         private static int currentForm = 0,

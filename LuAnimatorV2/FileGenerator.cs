@@ -75,20 +75,26 @@ namespace LuAnimatorV2
                         int i = 1;
                         if (emote.frames != null)
                         {
+                            BitmapSource prevbmp = null;
                             foreach (BitmapSource imglst in emote.frames)
                             {
-                                jsonFrames[i.ToString()] = GenerateDirective(imglst);
+                                if (!imglst.IsEqual(prevbmp))
+                                    jsonFrames[i.ToString()] = GenerateDirective(imglst);
                                 i += emote.speed;
+                                prevbmp = imglst;
                             }
                             jsonEmote["frames"] = jsonFrames;
                         }
                         int j = 1;
                         if (emote.fullbrightFrames != null)
                         {
+                            BitmapSource prevbmp = null;
                             foreach (BitmapSource imglst in emote.fullbrightFrames)
                             {
-                                jsonFFrames[j.ToString()] = GenerateDirective(imglst);
+                                if (!imglst.IsEqual(prevbmp))
+                                    jsonFFrames[j.ToString()] = GenerateDirective(imglst);
                                 j += emote.speed;
+                                prevbmp = imglst;
                             }
                             jsonEmote["fullbrightFrames"] = jsonFFrames;
                         }
