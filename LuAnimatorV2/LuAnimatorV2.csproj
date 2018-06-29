@@ -29,6 +29,7 @@
     <InstallUrl>https://raw.githubusercontent.com/Degranon/LuAnimator/master/publish/</InstallUrl>
     <UpdateUrl>https://raw.githubusercontent.com/Degranon/LuAnimator/master/publish/</UpdateUrl>
     <SupportUrl>https://plus.google.com/109386152747714156735</SupportUrl>
+    <TargetCulture>en</TargetCulture>
     <ProductName>LuAnimator</ProductName>
     <PublisherName>Degranon</PublisherName>
     <SuiteName>Luanimator</SuiteName>
@@ -36,7 +37,7 @@
     <WebPage>publish.htm</WebPage>
     <OpenBrowserOnPublish>false</OpenBrowserOnPublish>
     <TrustUrlParameters>true</TrustUrlParameters>
-    <ApplicationRevision>3</ApplicationRevision>
+    <ApplicationRevision>4</ApplicationRevision>
     <ApplicationVersion>4.0.1.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <CreateDesktopShortcut>true</CreateDesktopShortcut>
