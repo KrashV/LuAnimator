@@ -1,0 +1,7 @@
+[
+	{
+		"op": "add",
+    	"path": "/normal/-",
+    	"value": { "label" : "LuAnimator", "pane" : "/interface/luanimator/luanimatorgui.config", "icon" : "/quickbar/luaicon.png" }
+    }
+]

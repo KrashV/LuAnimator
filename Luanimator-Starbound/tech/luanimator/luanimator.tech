@@ -17,5 +17,5 @@
     "ball" : "/assetmissing.png"
   },
   
-  "sitSpeed": 0.25
+  "sitSpeed": 1000
 }
