@@ -1,0 +1,42 @@
+name: Generate Archive and Create Release
+
+on:
+  push:
+    branches:
+      - mod
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Pak the repository
+        run: |
+          .github/tools/asset_packer.exe . -c .github/tools/packing.config LuAnimator.pak
+
+      - name: Get version
+        id: extract_version
+        run: echo "::set-output name=version::$(jq -r '.version' _metadata)"
+
+      - name: 'Create GitHub Release'
+        uses: softprops/action-gh-release@v1
+        with:
+          body_path: CHANGELOG.txt
+          files: LuAnimator.pak       
+          tag_name: v${{ steps.extract_version.outputs.version }}
+          name: Release V${{ steps.extract_version.outputs.version }}
+
+      - name: Get changelog content
+        id: read_file
+        uses: andstor/file-reader-action@v1
+        with:
+          path: "CHANGELOG.txt"
+
+      - name: Discord Webhook Action
+        uses: tsickert/discord-webhook@v5.3.0
+        with:
+          webhook-url: ${{ secrets.WEBHOOK_URL }}
+          filename: LuAnimator.pak  
+          content: "<@&${{ vars.ROLE_MENTION }}> Irden Stat Manager V${{ steps.extract_version.outputs.version }}\n${{ steps.read_file.outputs.contents }}"

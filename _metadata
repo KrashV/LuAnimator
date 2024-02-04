@@ -1,0 +1,9 @@
+{
+  "version" : "Cheerful Giraffe - SB 1.3.3",
+  "author" : "Degranon & Silverfeelin",
+  "description" : "Another implementation of famous LuAnimator",
+  "requires" : [],
+  "path" : ".",
+  "name" : "Degranon's LuAnimator v5",
+  "includes" : []
+}

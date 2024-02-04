@@ -1,0 +1,37 @@
+{
+  "luanimator": {
+    "name": "LuAnimator",
+    "bannerName" : "LuAnimator",
+    "binds": {
+      "toggle": {
+        "default": [{
+          "type": "key",
+          "value": "M"
+        }],
+        "name": "Toggle animation"
+      },
+      "nextform": {
+        "default": [{
+          "type": "key",
+          "value": "."
+        }],
+        "name": "Next form"
+      },
+      "prevform": {
+        "default": [{
+          "type": "key",
+          "value": ","
+        }],
+        "name": "Previous form"
+      },
+      "sit": {
+        "default": [{
+          "type": "key",
+          "value": "G",
+          "mods": ["LShift"]
+        }],
+        "name": "Sit"
+      }
+    }
+  }
+}
