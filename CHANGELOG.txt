@@ -1,1 +1,1 @@
-- Allow usage of OpenStarbound input binds
+- Fixed changing forms not applying immediately

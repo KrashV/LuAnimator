@@ -411,6 +411,7 @@ function luAnimator.nextForm()
 		luAnimator.form = (luAnimator.form % #luAnimation) + 1
 	end
 	luAnimator.stateChanged = true
+  luAnimator.animationTick = 0
 end
 
 function luAnimator.previousForm()
@@ -420,6 +421,7 @@ function luAnimator.previousForm()
 		luAnimator.form = luAnimator.form > 1 and luAnimator.form - 1 or #luAnimation
 	end
 	luAnimator.stateChanged = true	
+  luAnimator.animationTick = 0
 end
 
 --[[
