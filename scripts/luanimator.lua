@@ -359,18 +359,18 @@ end
 function luAnimator.toggleSitting()
    luAnimator.sitting = not luAnimator.sitting
    
-   if luAnimator.sitting then
-	tech.setParentState("Sit")
-	if luAnimation[luAnimator.form].Sitting_Down then
-		luAnimator.justSatDown = true
-		luAnimator.justStandUp = false
-	end
+  if luAnimator.sitting then
+	  tech.setParentState("Sit")
+    if luAnimation[luAnimator.form].Sitting_Down then
+      luAnimator.justSatDown = true
+      luAnimator.justStandUp = false
+    end
    else
-	tech.setParentState()
-	if luAnimation[luAnimator.form].Standing_Up then
-		luAnimator.justStandUp = true
-		luAnimator.justSatDown = false
-	end
+	  tech.setParentState()
+    if luAnimation[luAnimator.form].Standing_Up then
+      luAnimator.justStandUp = true
+      luAnimator.justSatDown = false
+    end
    end
 end
 
@@ -556,7 +556,7 @@ function init()
 	end
 
 
-  if not _ENV["starExtensions"] then
+  if not _ENV["starExtensions"] and not _ENV["renderer"] then
     Bind.create("specialThree shift", function()
     -- if not status.statusProperty("luaInterfaceEnabled",  nil) then
       -- world.sendEntityMessage(entity.id(),"interact","ScriptPane", "/interface/luanimator/luanimatorgui.config")

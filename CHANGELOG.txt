@@ -1,1 +1,1 @@
-- Fixed changing forms not applying immediately
+- Fixed sitting not working. Oops!
