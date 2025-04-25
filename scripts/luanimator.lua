@@ -338,7 +338,7 @@ function luAnimator.transformGroup(state)
   if state then
     animator.resetTransformationGroup("ball")
     animator.translateTransformationGroup("ball", state.properties.translation)
-    animator.rotateTransformationGroup("ball", mcontroller.rotation())
+    animator.rotateTransformationGroup("ball", mcontroller.rotation() *  mcontroller.facingDirection())
     animator.scaleTransformationGroup("ball", state.properties.frameScale, state.properties.translation)
     tech.setParentHidden(state.properties.isInvisible)
   end

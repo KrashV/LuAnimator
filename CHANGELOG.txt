@@ -1,1 +1,1 @@
-- Fixed sitting not working. Oops!
+- Fixed rotation to the left not working properly. Oops!
