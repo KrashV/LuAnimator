@@ -12,13 +12,47 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v2
 
-      - name: Pak the repository
-        run: |
-          .github/tools/asset_packer.exe . -c .github/tools/packing.config LuAnimator.pak
-
       - name: Get version
         id: extract_version
         run: echo "::set-output name=version::$(jq -r '.version' _metadata)"
+        
+      - name: Get latest release version
+        id: latest_release
+        shell: bash
+        env:
+          REPO: ${{ github.repository }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Fetch latest release from GitHub API
+          LATEST_TAG=$(curl -s -H "Authorization: Bearer $GH_TOKEN" \
+            https://api.github.com/repos/$REPO/releases/latest \
+            | jq -r '.tag_name')
+
+          echo "Latest release tag: $LATEST_TAG"
+
+          # Strip leading 'v' if present so we can compare plain versions
+          CLEAN_TAG=${LATEST_TAG#v}
+          echo "clean_tag=$CLEAN_TAG" >> $GITHUB_OUTPUT
+
+      - name: Fail if version is same as latest release
+        shell: bash
+        run: |
+          META_VERSION="${{ steps.extract_version.outputs.version }}"
+          LATEST_VERSION="${{ steps.latest_release.outputs.clean_tag }}"
+
+          echo "Metadata version: $META_VERSION"
+          echo "Latest release version: $LATEST_VERSION"
+
+          if [ "$META_VERSION" = "$LATEST_VERSION" ]; then
+            echo "Error: Version $META_VERSION is already the latest release. Bump the version in _metadata."
+            exit 1
+          fi
+
+      - name: Run Asset Packer
+        uses: KrashV/starbound-asset-packer-action@v1
+        with:
+          output: LuAnimator.pak
+
 
       - name: 'Create GitHub Release'
         uses: softprops/action-gh-release@v1
