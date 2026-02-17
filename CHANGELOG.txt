@@ -1,1 +1,1 @@
-- Fixed rotation to the left not working properly. Oops!
+- FINALLY fixed the issue when you are transforming/turning the animation on and emote (i.e. blink), the animation reset. Now it's smooth and working!

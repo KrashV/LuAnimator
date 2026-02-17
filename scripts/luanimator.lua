@@ -13,6 +13,13 @@ luAnimator = {
     sitting = {
 	collisionEnabled = false
     }
+  },
+  -- states that should ignore emote changes while playing (won't restart animation)
+  emoteIgnoreStates = {
+    Transform_Next = true,
+    Transform_Previous = true,
+    Activate = true,
+    Deactivate = true
   }
 }
 
@@ -156,11 +163,16 @@ function luAnimator.getState(args)
 
   local validEmote = luAnimation[luAnimator.form][newState] and luAnimation[luAnimator.form][newState].emotes[luAnimator.emote]
 
-  if newState ~= "none" 
-    and (newState ~= previousState or luAnimator.emote ~= previousEmote)
+  -- If we're playing a long-running state that should ignore emote changes,
+  -- don't restart the animation just because the player's emote changed.
+  -- Also: only restart on an emote change when the new emote actually exists
+  -- for the target state (unknown emotes should not reset the animation).
+  local emoteChanged = luAnimator.emote ~= previousEmote
+  local ignoreEmote = luAnimator.emoteIgnoreStates and luAnimator.emoteIgnoreStates[previousState]
+  if newState ~= "none"
+    and (newState ~= previousState or (emoteChanged and validEmote and not ignoreEmote))
     and luAnimation[luAnimator.form][newState] then
 
-    
     luAnimator.animationTick = 0
     luAnimator.soundTick = 0
     animator.stopAllSounds("activate")
